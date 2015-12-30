@@ -5,6 +5,7 @@
 import requests as r
 import json
 from base64 import standard_b64decode as b64decode
+import threading
 
 
 class connector:
@@ -25,7 +26,26 @@ class connector:
 		data = r.delete(self.address+'/notification/callback',headers={"Authorization":"Bearer "+self.bearer})
 		return data.status_code
 
-	# Constantly long poll connector and process the feedback.
+	# this function needs to spin off a thread that is constantally polling, 
+	# should match asynch ID's to values and call their function
+	def startLongPolling(self, noWait=False):
+		# check Asynch ID's against insternal database of ID's
+		# Call return function with the value given, maybe decode from base64?
+		wait = ''
+		if(noWait == True):
+			wait = "?noWait=true"
+		# check that there isn't another thread already running, only one longPolling instance per is acceptable
+		if(self.longPollThread.isAlive()):
+			print "LongPolling is already active."
+		else:
+			# start infinite longpolling thread
+			self.longPollThread.start()
+			print "Spun off LongPolling thread"
+		return self.longPollThread # return thread instance so user can manually intervene if necessary
+
+	# Thread to constantly long poll connector and process the feedback.
+	# TODO: handle failed callbacks, ie try to post when posting not allowed
+	# TODO: break out handler into seperate function so it can be used by webhooks and longpolling
 	def longPoll(self,wait = ""):
 		while True:
 			data = r.get(self.address+'/notification/pull'+wait,headers={"Authorization":"Bearer "+self.bearer})
@@ -36,23 +56,6 @@ class connector:
 					if item['id'] in self.ResponseCodeList:
 						#print("ID : "+self.ResponseCodeList[item['id']]+"\r\nValue :"+b64decode(item['payload'])) #TODO call callback here with passed value
 						self.ResponseCodeList[item['id']](b64decode(item['payload'])) #trigger callback function registered with async-response ID and pass it the decoded data value
-
-	#this function needs to spin off a thread that is constantally polling, 
-	# should match asynch ID's to values and call their function
-	# TODO: handle failed callbacks, ie try to post when posting not allowed
-	def startLongPolling(self, noWait=False):
-		import threading
-		# check Asynch ID's against insternal database of ID's
-		# Call return function with the value given, maybe decode from base64?
-		wait = ''
-		if(noWait == True):
-			wait = "?noWait=true"
-		# spin this off into a seperate thread that while(1) for duration of class existance
-		thread = threading.Thread(target=self.longPoll,name="mbed-connector-longpoll")
-		thread.daemon = True # Do this so the thread exits when the overall process does
-		thread.start()  
-		print "Spun off LongPolling thread"
-		return
 
 	def registerPreSubscription(self,preSubscriptionData):
 		data = r.put(self.address+'/subscriptions',json=preSubscriptionData)
@@ -135,6 +138,9 @@ class connector:
 		self.bearer = token
 		# Init ResponseCodeList, used for callback fn's for Asynch handling
 		self.ResponseCodeList = {}
+		#create thread for long polling
+		self.longPollThread = threading.Thread(target=self.longPoll,name="mbed-connector-longpoll")
+		self.longPollThread.daemon = True # Do this so the thread exits when the overall process does
 		# set default webAddress to mbed connector
 		if webAddress == '':
 			self.address = "https://api.connector.mbed.com"
