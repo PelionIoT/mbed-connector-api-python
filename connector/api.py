@@ -44,18 +44,28 @@ class connector:
 		return self.longPollThread # return thread instance so user can manually intervene if necessary
 
 	# Thread to constantly long poll connector and process the feedback.
-	# TODO: handle failed callbacks, ie try to post when posting not allowed
-	# TODO: break out handler into seperate function so it can be used by webhooks and longpolling
+	# TODO: pass wait / noWait on to long polling thread, currently the user can set it but it doesnt actually affect anything. 
 	def longPoll(self,wait = ""):
 		while True:
 			data = r.get(self.address+'/notification/pull'+wait,headers={"Authorization":"Bearer "+self.bearer})
+			self.asyncHandler(data)
 			#print("data = "+data.content)
-			#itterate over returned items, if they have a callback fn in ResponseCodeList then call that function, passing in data from asynch callback decoded from base64
+
+	# Handle callback functions from both long polling and webhooks
+	# data is the raw request data returned
+	# TODO: handle failed callbacks, ie try to post when posting not allowed
+	# TODO: make handler more robust, currently only does stuff for asynch get's, need to handle notifications / subscriptions, errors... etc
+	def asyncHandler(self, data):
+		#itterate over returned items, if they have a callback fn in ResponseCodeList then call that function, passing in data from asynch callback decoded from base64
+		try:
 			if 'async-responses' in json.loads(data.content).keys():
 				for item in json.loads(data.content)['async-responses'] :
 					if item['id'] in self.ResponseCodeList:
 						#print("ID : "+self.ResponseCodeList[item['id']]+"\r\nValue :"+b64decode(item['payload'])) #TODO call callback here with passed value
 						self.ResponseCodeList[item['id']](b64decode(item['payload'])) #trigger callback function registered with async-response ID and pass it the decoded data value
+						return
+		except:
+			return # value not JSON data, nothing to process here
 
 	def registerPreSubscription(self,preSubscriptionData):
 		data = r.put(self.address+'/subscriptions',json=preSubscriptionData)
@@ -83,8 +93,11 @@ class connector:
 		return {'data':data.content,'status':data.status_code}
 
 	# return JSON list of endpoints
-	def getEndpoints(self):
-		data = r.get(self.address+"/endpoints",headers={"Authorization":"Bearer "+self.bearer})
+	# GET /endpoints<?type=typeOfEndpoint>
+	def getEndpoints(self, typeOfEndpoint=""):
+		if(typeOfEndpoint):
+			typeOfEndpoint = "?type="+typeOfEndpoint
+		data = r.get(self.address+"/endpoints"+typeOfEndpoint,headers={"Authorization":"Bearer "+self.bearer})
 		return {'data':data.content,'status':data.status_code}
 
 	# return JSON list of resources on an endpoint
@@ -102,30 +115,26 @@ class connector:
 			options="?cacheOnly=true"
 		elif(noResp):
 			options="?noResp=true"
-		data = r.get(self.address+"/endpoints/"+endpoint+resource+options,headers={"Authorization":"Bearer "+self.bearer})
-		print('data = '+data.content)
-		if 'async-response-id' in json.loads(data.content).keys():
-			self.ResponseCodeList[json.loads(data.content)['async-response-id']] = callbackFn # add callback function for response ID
-		#	print("response Code list = "+json.dumps(self.ResponseCodeList))
-		return {'data':json.loads(data.content),'status':data.status_code}
+		data = r.get(self.address+"/endpoints/"+endpoint+"/"+resource+options,headers={"Authorization":"Bearer "+self.bearer})
+		#print('data = '+data.content)
+		try:
+			if 'async-response-id' in json.loads(data.content).keys():
+				self.ResponseCodeList[json.loads(data.content)['async-response-id']] = callbackFn # add callback function for response ID
+			#	print("response Code list = "+json.dumps(self.ResponseCodeList))
+			return {'data':json.loads(data.content),'status':data.status_code}
+		except:
+			return False
 
+	# Maybe this should default to put, and have an extra function called Execute resource to post?
 	def setResource(self,endpoint,resource,dataIn,cacheOnly=False,noResp=False):
-		options = ""
-		if(cacheOnly and noResp):
-			options = "?cacheOnly=true&noResp=true"
-		elif(cacheOnly):
-			options="?cacheOnly=true"
-		elif(noResp):
-			options="?noResp=true"
-		data = r.put(self.address+"/endpoints/"+endpoint+resource+options,data=dataIn,headers={"Authorization":"Bearer "+self.bearer})
-		return {'data':data.content,'status':data.status_code}
+		return
 
 	def putResource(self,endpoint,resource,dataIn):
-		data = r.put(self.address+"/endpoints/"+endpoint+resource,data=dataIn,headers={"Authorization":"Bearer "+self.bearer})
+		data = r.put(self.address+"/endpoints/"+endpoint+"/"+resource,data=dataIn,headers={"Authorization":"Bearer "+self.bearer})
 		return {'data':json.loads(data.content),'status':data.status_code}
 
 	def postResource(self,endpoint,resource,dataIn):
-		data = r.post(self.address+"/endpoints/"+endpoint+resource,data=dataIn,headers={"Authorization":"Bearer "+self.bearer})
+		data = r.post(self.address+"/endpoints/"+endpoint+"/"+resource,data=dataIn,headers={"Authorization":"Bearer "+self.bearer})
 		return {'data':json.loads(data.content),'status':data.status_code}
 
 
