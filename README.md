@@ -1,3 +1,6 @@
+## Warning
+This is still in internal Alpha and should not be released to the public or to partners. This is a proof of concept to spur the creation of a more general library and a better API. The goal is to eventually have a meta language to write the interface API in that generates code for python, ruby, nodeJS and others. 
+
 ## Purpose
 This library is meant to be used in conjuntion with the [connector.mbed.com](www.connector.mbed.com) service. This library uses the requests library to interface to mbed connector via HTTP REST calls. Details on the mbed connector RESTful interface can be found [here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/Introduction/#how-to-use-the-api). You can use this library either as part of a webapp or locally on your computer.
 
