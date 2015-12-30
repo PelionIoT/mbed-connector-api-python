@@ -1,11 +1,17 @@
-## Intro
+## Purpose
 This library is meant to be used in conjuntion with [connector.mbed.com](www.connector.mbed.com). This library uses the requests library to interface over HTTP REST calls with mbed connector. Details on the rest interface can be found [here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/Introduction/#how-to-use-the-api). You can use this library either as part of a webapp or on your computer. 
+
+## API
+TODO
 
 ## Examples
 These examples demonstrate how to use the mbed-connector python library in two instances. First is remotely on as part of a webapp where you will register a callback address. Second is locally on your computer where you will use LongPolling to constantly poll the server for responses to your requests. This is necessary as machines behind firewalls cannot easily register url callbacks.  
 #### web app
+```python
 TODO: put in Flask webapp example
-#### local on computer
+```
+
+#### locally hosted
 
 ```python
 import mbed-connector
@@ -20,5 +26,5 @@ x.postResource("EndpointName","Resource","Value") # send the "Value" to the "Res
 # TODO: Subscriptions / Notifications
 ```
 
-## Liscense
+## License
 Apache 2.0
