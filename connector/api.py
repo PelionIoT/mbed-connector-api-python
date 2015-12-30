@@ -25,26 +25,34 @@ class connector:
 		data = r.delete(self.address+'/notification/callback',headers={"Authorization":"Bearer "+self.bearer})
 		return data.status_code
 
+	# Constantly long poll connector and process the feedback.
+	def longPoll(self,wait = ""):
+		while True:
+			data = r.get(self.address+'/notification/pull'+wait,headers={"Authorization":"Bearer "+self.bearer})
+			#print("data = "+data.content)
+			#itterate over returned items, if they have a callback fn in ResponseCodeList then call that function, passing in data from asynch callback decoded from base64
+			if 'async-responses' in json.loads(data.content).keys():
+				for item in json.loads(data.content)['async-responses'] :
+					if item['id'] in self.ResponseCodeList:
+						#print("ID : "+self.ResponseCodeList[item['id']]+"\r\nValue :"+b64decode(item['payload'])) #TODO call callback here with passed value
+						self.ResponseCodeList[item['id']](b64decode(item['payload'])) #trigger callback function registered with async-response ID and pass it the decoded data value
+
 	#this function needs to spin off a thread that is constantally polling, 
 	# should match asynch ID's to values and call their function
 	# TODO: handle failed callbacks, ie try to post when posting not allowed
 	def startLongPolling(self, noWait=False):
+		import threading
 		# check Asynch ID's against insternal database of ID's
 		# Call return function with the value given, maybe decode from base64?
 		wait = ''
 		if(noWait == True):
 			wait = "?noWait=true"
-		#else:
-			#TODO: spin this off into a seperate thread that while(1) for duration of class existance
-		data = r.get(self.address+'/notification/pull'+wait,headers={"Authorization":"Bearer "+self.bearer})
-		#print("data = "+data.content)
-		#itterate over returned items, if they have a callback fn in ResponseCodeList then call that function, passing in data from asynch callback decoded from base64
-		if 'async-responses' in json.loads(data.content).keys():
-			for item in json.loads(data.content)['async-responses'] :
-				if item['id'] in self.ResponseCodeList:
-					#print("ID : "+self.ResponseCodeList[item['id']]+"\r\nValue :"+b64decode(item['payload'])) #TODO call callback here with passed value
-					self.ResponseCodeList[item['id']](b64decode(item['payload'])) #trigger callback function registered with async-response ID and pass it the decoded data value
-		return # {'data':json.loads(data.content),'status':data.status_code}
+		# spin this off into a seperate thread that while(1) for duration of class existance
+		thread = threading.Thread(target=self.longPoll,name="mbed-connector-longpoll")
+		thread.daemon = True # Do this so the thread exits when the overall process does
+		thread.start()  
+		print "Spun off LongPolling thread"
+		return
 
 	def registerPreSubscription(self,preSubscriptionData):
 		data = r.put(self.address+'/subscriptions',json=preSubscriptionData)
