@@ -17,13 +17,16 @@ class asyncResult:
 	def isDone(self):
 		return self.is_done
 
-	def __init__(self, callback = {}):
+	def __init__(self, callback=""):
 		self.is_done = False
 		self.result = {}
 		self.callback = callback
 		self.status_code = ''
 		self.next_step = ""
 		self.raw_data = {}
+		self.error = ""
+		self.extra = {}
+
 
 class connector:
 	"""Class to create connector objects and manage connections"""
@@ -73,26 +76,53 @@ class connector:
 	# TODO: handle failed callbacks, ie try to post when posting not allowed
 	# TODO: make handler more robust, currently only does stuff for asynch get's, need to handle notifications / subscriptions, errors... etc
 	def asyncHandler(self, data):
-		print data
-		#itterate over returned items, if they have a callback fn in ResponseCodeList then call that function, passing in data from asynch callback decoded from base64
+		#print data
+		#itterate over returned items, if they have a callback fn in database then call that function, passing in data from asynch callback decoded from base64
 		try:
 			if 'async-responses' in json.loads(data.content).keys():
 				#print "\r\n'async-responses' from asynch : "
 				#print json.loads(data.content)['async-responses']
-				for item in json.loads(data.content)['async-responses'] :
-					if item['id'] in self.ResponseCodeList:
-						#print("ID : "+self.ResponseCodeList[item['id']]+"\r\nValue :"+b64decode(item['payload'])) #TODO call callback here with passed value
-						self.ResponseCodeList[item['id']](data.status_code,b64decode(item['payload'])) #trigger callback function registered with async-response ID and pass it the decoded data value
+				for item in json.loads(data.content)['async-responses'] : #itterate through async responses
+					asyncHash = item['id']
+					if asyncHash in self.database['async-responses']: # check for matching async response in database
+						# update result object with response values
+						result = self.database['async-responses'][asyncHash]
+						result.raw_data = item
+						result.status_code = item['status']
+						if(result.status_code > 202):
+							result.error = item['error']
+						if(item['payload']):
+							result.result = b64decode(item['payload'])
+						#process result, move in database to next step (subscriptions)
+						if(result.next_step):
+							if(result.next_step == 'notifications' and result.status_code == 200 ):
+								self.database['notifications'][result.extra['ep']][result.extra['path']] = result.callback
+							else:
+								print "asyncHandler processing notification to next step, return code 200 != " +str(result.status_code)
+
+						# if no next step, trigger callback(decoded data, rawData) (getResource..etc)
+						elif(result.callback): 
+							result.callback(b64decode(item['payload']),item) 
+						#else: 
+							#do nothing
+						#del self.database['async-responses'][asyncHash] # remove item from database
+						result.is_done = True 	# mark item as finished completing
+						
 			if 'notifications' in json.loads(data.content).keys():
 				#handle notifications
 				print "\r\n'notifications' from asynch :" 
 				print json.loads(data.content)['notifications']
+				for item in json.loads(data.content)['notifications'] : # itterate through notifications
+					if item['ep'] in self.database['notifications']:	# check if endpoint is registered
+						if item['path'] in self.database['notifications'][item['ep']]: # check if resource is registered
+							self.database['notifications'][item['ep']][item['path']](b64decode(item['payload']),item) # callbackFn(decodedData,rawData)
+
 			if 'registrations' in json.loads(data.content).keys():
 				#handle registrations
 				print "\r\n'registrations' from asynch :" 
 				print json.loads(data.content)['registrations']
-			#if 'reg-updates' in json.loads(data.content).keys():
-				#handle reg-updates
+			if 'reg-updates' in json.loads(data.content).keys():
+				# handle reg-updates
 				#print "\r\n'reg-updates' from asynch :" 
 				#print json.loads(data.content)['reg-updates']
 			if 'de-registrations' in json.loads(data.content).keys():
@@ -118,13 +148,18 @@ class connector:
 		return {'data':data.content,'status':data.status_code}
 
 	def subscribeToResource(self,endpoint, resource,callbackFn):
-		data = r.put(self.address+"/subscriptions/"+endpoint+"/"+resource,headers={"Authorization":"Bearer "+self.bearer})
-		print data
+		data = r.put(self.address+"/subscriptions/"+endpoint+resource,headers={"Authorization":"Bearer "+self.bearer})
+		#print data.content
 		try:
 			if 'async-response-id' in json.loads(data.content).keys():
-				self.__addCallback(json.loads(data.content)['async-response-id'],callbackFn) # add callback function for response ID
-			#	print("response Code list = "+json.dumps(self.ResponseCodeList))
-			return {'data':json.loads(data.content),'status':data.status_code}
+				result = asyncResult(callbackFn)
+				result.next_step = "notifications"
+				result.extra = {"ep":endpoint, "path":resource}
+				asyncHash = json.loads(data.content)['async-response-id']
+				self.database['async-responses'][asyncHash] = result
+				#self.__addCallback(json.loads(data.content)['async-response-id'],callbackFn) # add callback function for response ID
+			#	print("response Code list = "+json.dumps(self.database))
+				return result
 		except:
 			print "\r\nsubscribeToResource failed"
 			ex_type, ex, tb = sys.exc_info()
@@ -138,17 +173,17 @@ class connector:
 		if(endpoint == None and resource == None): 
 			data = r.delete(self.address+"/subscriptions",headers={"Authorization":"Bearer "+self.bearer})
 		else:
-			data = r.delete(self.address+"/subscriptions/"+endpoint+"/"+resource,headers={"Authorization":"Bearer "+self.bearer})
+			data = r.delete(self.address+"/subscriptions/"+endpoint+resource,headers={"Authorization":"Bearer "+self.bearer})
 		return data
 
 	# get max number and current used number of packets and endpoints 
 	def checkLimit(self):
 		data = r.get(self.address+"/limits",headers={"Authorization":"Bearer "+self.bearer})
-		return {'data':data.content,'status':data.status_code}
+		return {'data':json.loads(data.content),'status':data.status_code}
 
 	def getSubscriptions(self):
 		data = r.get(self.address+'/subscriptions',headers={"Authorization":"Bearer "+self.bearer})
-		return {'data':data.content,'status':data.status_code}
+		return {'data':json.loads(data.content),'status':data.status_code}
 
 	# return JSON list of endpoints
 	# GET /endpoints<?type=typeOfEndpoint>
@@ -156,15 +191,15 @@ class connector:
 		if(typeOfEndpoint):
 			typeOfEndpoint = "?type="+typeOfEndpoint
 		data = r.get(self.address+"/endpoints"+typeOfEndpoint,headers={"Authorization":"Bearer "+self.bearer})
-		return {'data':data.content,'status':data.status_code}
+		return {'data':json.loads(data.content),'status':data.status_code}
 
 	# return JSON list of resources on an endpoint
 	def getResources(self,endpoint):
 		data = r.get(self.address+"/endpoints/"+endpoint,headers={"Authorization":"Bearer "+self.bearer})
-		return {'data':data.content,'status':data.status_code}
+		return {'data':json.loads(data.content),'status':data.status_code}
 
 	# return value of resource
-	def getResource(self,endpoint,resource,callbackFn,cacheOnly=False,noResp=False):
+	def getResource(self,endpoint,resource,callbackFn="",cacheOnly=False,noResp=False):
 		#TODO: impliment cacheOnly / noResp flags
 		options = ""
 		if(cacheOnly and noResp):
@@ -173,13 +208,16 @@ class connector:
 			options="?cacheOnly=true"
 		elif(noResp):
 			options="?noResp=true"
-		data = r.get(self.address+"/endpoints/"+endpoint+"/"+resource+options,headers={"Authorization":"Bearer "+self.bearer})
-		print('getResource data = '+data.content)
+		data = r.get(self.address+"/endpoints/"+endpoint+resource+options,headers={"Authorization":"Bearer "+self.bearer})
+		#print('getResource data = '+data.content)
 		try:
-			if( data.status_code == 200 and 'async-response-id' in json.loads(data.content).keys()):
-				self.__addCallback(json.loads(data.content)['async-response-id'],callbackFn) # add callback function for response ID
-			#	print("response Code list = "+json.dumps(self.ResponseCodeList))
-			return {'data':json.loads(data.content),'status':data.status_code}
+			if( data.status_code == 202 and 'async-response-id' in json.loads(data.content).keys()):
+				#self.__addCallback(json.loads(data.content)['async-response-id'],callbackFn) # add callback function for response ID
+				asyncHash = json.loads(data.content)['async-response-id']
+				result = asyncResult(callbackFn)
+				self.database['async-responses'][asyncHash] = result
+			#	print("response Code list = "+json.dumps(self.database))
+				return result
 		except:
 			print("\r\ngetResource failed")
 			ex_type, ex, tb = sys.exc_info()
@@ -193,28 +231,35 @@ class connector:
 		return
 
 	def putResource(self,endpoint,resource,dataIn):
-		data = r.put(self.address+"/endpoints/"+endpoint+"/"+resource,data=dataIn,headers={"Authorization":"Bearer "+self.bearer})
+		data = r.put(self.address+"/endpoints/"+endpoint+resource,data=dataIn,headers={"Authorization":"Bearer "+self.bearer})
 		return {'data':json.loads(data.content),'status':data.status_code}
 
 	def postResource(self,endpoint,resource,dataIn):
-		data = r.post(self.address+"/endpoints/"+endpoint+"/"+resource,data=dataIn,headers={"Authorization":"Bearer "+self.bearer})
+		data = r.post(self.address+"/endpoints/"+endpoint+resource,data=dataIn,headers={"Authorization":"Bearer "+self.bearer})
 		return {'data':json.loads(data.content),'status':data.status_code}
 
 
 	#TODO: write Event handler .on() for registrations, de-registrations, reg-updates, notifications
 	#on('registrations', callback)
 
-	# function to add asynch-callback's to the internal dictionary
-	def __addCallback(self,asyncID,callbackFn):
-		print("__addCallback asynchID = "+asyncID+", callbackFn = "+callbackFn.func_name)
-		self.ResponseCodeList[asyncID] = callbackFn
+	# extend dictionary class so we can instantiate multiple levels at once
+	class vividict(dict):
+		def __missing__(self, key):
+			value = self[key] = type(self)()
+			return value
 
 	# Initialization function, set the token used by this object. 
 	def __init__(self,token,webAddress=""):
 		# set token
 		self.bearer = token
-		# Init ResponseCodeList, used for callback fn's for Asynch handling
-		self.ResponseCodeList = {}
+		# Init database, used for callback fn's for various tasks (asynch, subscriptions...etc)
+		self.database = self.vividict()
+		self.database['notifications']
+		self.database['registrations']
+		self.database['reg-updates']
+		self.database['de-registrations']
+		self.database['registrations-expired']
+		self.database['async-responses']
 		#create thread for long polling
 		self.longPollThread = threading.Thread(target=self.longPoll,name="mbed-connector-longpoll")
 		self.longPollThread.daemon = True # Do this so the thread exits when the overall process does
