@@ -105,7 +105,8 @@ class connector:
 							result.callback(b64decode(item['payload']),item) 
 						#else: 
 							#do nothing
-						#del self.database['async-responses'][asyncHash] # remove item from database
+						#TODO: remove things from database as necessary, currently this breaks subscriptions for some reason
+						#del self.database['async-responses'][asyncHash] # remove item from database 
 						result.is_done = True 	# mark item as finished completing
 						
 			if 'notifications' in json.loads(data.content).keys():
