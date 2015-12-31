@@ -121,7 +121,7 @@ class connector:
 				#handle registrations
 				print "\r\n'registrations' from asynch :" 
 				print json.loads(data.content)['registrations']
-			if 'reg-updates' in json.loads(data.content).keys():
+			#if 'reg-updates' in json.loads(data.content).keys(): # commented out because this returns the most often, was flooding the terminal
 				# handle reg-updates
 				#print "\r\n'reg-updates' from asynch :" 
 				#print json.loads(data.content)['reg-updates']
