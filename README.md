@@ -27,11 +27,26 @@ x.startLongPolling()
 # Use 
 x.getEndpoints() # returns a  list of all endpoints on your domain
 x.getResources("EndpointName") # returns all resources of an endpoint
-x.getResource("EndpointName","Resource", callbackFN) # This will pass the resource value to the callbackFN, the <resource> will have the form of "X/Y/Z" 
 x.putResource("EndpointName","Resource","Value") # send the "Value" to the "Resource" over a PUT request
 x.postResource("EndpointName","Resource","Value") # send the "Value" to the "Resource" over a POST request
+y = x.getResource("EndpointName","Resource")  # check the y.isDone() funciton to see when the request completes, the result will then be in y.result. The Resource should be of the form "/X/Y/Z"
+if y.isDone():
+    print "The value of y is " +str(y.result)
 
-# TODO: Subscriptions / Notifications
+##########
+
+# alternatively you can call a callback fn instead
+def callbackFn(dataIn, rawData):
+    print "TestFN"
+    print "data : " +str(dataIn)
+    print "raw JSON Data : " +str(rawData)
+
+x.getResource("EndpointName","Resource",callbackFn)
+
+##########
+
+x.subscribeToResource("Endpoint","Resource",callbackFN) # This will call the callbackFn every time the Endpoint/Resource value changes.
+
 ```
 
 ## License
