@@ -76,65 +76,67 @@ class connector:
 	# TODO: handle failed callbacks, ie try to post when posting not allowed
 	# TODO: make handler more robust, currently only does stuff for asynch get's, need to handle notifications / subscriptions, errors... etc
 	def asyncHandler(self, data):
-		#print data
 		#itterate over returned items, if they have a callback fn in database then call that function, passing in data from asynch callback decoded from base64
 		try:
-			if 'async-responses' in json.loads(data.content).keys():
-				#print "\r\n'async-responses' from asynch : "
-				#print json.loads(data.content)['async-responses']
-				for item in json.loads(data.content)['async-responses'] : #itterate through async responses
-					asyncHash = item['id']
-					if asyncHash in self.database['async-responses']: # check for matching async response in database
-						# update result object with response values
-						result = self.database['async-responses'][asyncHash]
-						result.raw_data = item
-						result.status_code = item['status']
-						if(result.status_code > 202):
-							result.error = item['error']
-						if(item['payload']):
-							result.result = b64decode(item['payload'])
-						#process result, move in database to next step (subscriptions)
-						if(result.next_step):
-							if(result.next_step == 'notifications' and result.status_code == 200 ):
-								self.database['notifications'][result.extra['ep']][result.extra['path']] = result.callback
-							else:
-								print "asyncHandler processing notification to next step, return code 200 != " +str(result.status_code)
-
-						# if no next step, trigger callback(decoded data, rawData) (getResource..etc)
-						elif(result.callback): 
-							result.callback(b64decode(item['payload']),item) 
-						#else: 
-							#do nothing
-						#TODO: remove things from database as necessary, currently this breaks subscriptions for some reason
-						#del self.database['async-responses'][asyncHash] # remove item from database 
-						result.is_done = True 	# mark item as finished completing
-						
-			if 'notifications' in json.loads(data.content).keys():
-				#handle notifications
-				print "\r\n'notifications' from asynch :" 
-				print json.loads(data.content)['notifications']
-				for item in json.loads(data.content)['notifications'] : # itterate through notifications
-					if item['ep'] in self.database['notifications']:	# check if endpoint is registered
-						if item['path'] in self.database['notifications'][item['ep']]: # check if resource is registered
-							self.database['notifications'][item['ep']][item['path']](b64decode(item['payload']),item) # callbackFn(decodedData,rawData)
-
-			if 'registrations' in json.loads(data.content).keys():
-				#handle registrations
-				print "\r\n'registrations' from asynch :" 
-				print json.loads(data.content)['registrations']
-			#if 'reg-updates' in json.loads(data.content).keys(): # commented out because this returns the most often, was flooding the terminal
-				# handle reg-updates
-				#print "\r\n'reg-updates' from asynch :" 
-				#print json.loads(data.content)['reg-updates']
-			if 'de-registrations' in json.loads(data.content).keys():
-				#handle de-registrations
-				print "\r\n'de-registrations' from asynch :" 
-				print json.loads(data.content)['de-registrations']
-			if 'registrations-expired' in json.loads(data.content).keys():
-				#handle registrations-expired
-				print "\r\n'registrations-expired' from asynch :" 
-				print json.loads(data.content)['registrations-expired']
-			return
+			if data.status_code != 204: # 204 = no response
+				if 'async-responses' in json.loads(data.content).keys():
+					#print "\r\n'async-responses' from asynch : "
+					#print json.loads(data.content)['async-responses']
+					for item in json.loads(data.content)['async-responses'] : #itterate through async responses
+						asyncHash = item['id']
+						if asyncHash in self.database['async-responses']: # check for matching async response in database
+							# update result object with response values
+							result = self.database['async-responses'][asyncHash]
+							result.raw_data = item
+							result.status_code = item['status']
+							if(result.status_code > 202):
+								result.error = item['error']
+							if(item['payload']):
+								result.result = b64decode(item['payload'])
+							#process result, move in database to next step (subscriptions)
+							if(result.next_step):
+								if(result.next_step == 'notifications' and result.status_code == 200 ):
+									self.database['notifications'][result.extra['ep']][result.extra['path']] = result.callback
+									#del self.database['async-responses'][asyncHash] # remove item from database 
+								else:
+									print "asyncHandler processing notification to next step, return code 200 != " +str(result.status_code)
+	
+							# if no next step, trigger callback(decoded data, rawData) (getResource..etc)
+							elif(result.callback): 
+								result.callback(b64decode(item['payload']),item) 
+								#del self.database['async-responses'][asyncHash] # remove item from database 
+							#else: 
+								#do nothing
+							#TODO: remove things from database as necessary, currently this breaks subscriptions for some reason
+							#del self.database['async-responses'][asyncHash] # remove item from database 
+							result.is_done = True 	# mark item as finished completing
+							
+				if 'notifications' in json.loads(data.content).keys():
+					#handle notifications
+					print "\r\n'notifications' from asynch :" 
+					print json.loads(data.content)['notifications']
+					for item in json.loads(data.content)['notifications'] : # itterate through notifications
+						if item['ep'] in self.database['notifications']:	# check if endpoint is registered
+							if item['path'] in self.database['notifications'][item['ep']]: # check if resource is registered
+								self.database['notifications'][item['ep']][item['path']](b64decode(item['payload']),item) # callbackFn(decodedData,rawData)
+	
+				if 'registrations' in json.loads(data.content).keys():
+					#handle registrations
+					print "\r\n'registrations' from asynch :" 
+					print json.loads(data.content)['registrations']
+				#if 'reg-updates' in json.loads(data.content).keys(): # commented out because this returns the most often, was flooding the terminal
+					# handle reg-updates
+					#print "\r\n'reg-updates' from asynch :" 
+					#print json.loads(data.content)['reg-updates']
+				if 'de-registrations' in json.loads(data.content).keys():
+					#handle de-registrations
+					print "\r\n'de-registrations' from asynch :" 
+					print json.loads(data.content)['de-registrations']
+				if 'registrations-expired' in json.loads(data.content).keys():
+					#handle registrations-expired
+					print "\r\n'registrations-expired' from asynch :" 
+					print json.loads(data.content)['registrations-expired']
+				return
 		except:
 			print "\r\nasynch handler failed!"
 			ex_type, ex, tb = sys.exc_info()
@@ -152,15 +154,37 @@ class connector:
 		data = r.put(self.address+"/subscriptions/"+endpoint+resource,headers={"Authorization":"Bearer "+self.bearer})
 		#print data.content
 		try:
-			if 'async-response-id' in json.loads(data.content).keys():
-				result = asyncResult(callbackFn)
-				result.next_step = "notifications"
-				result.extra = {"ep":endpoint, "path":resource}
-				asyncHash = json.loads(data.content)['async-response-id']
-				self.database['async-responses'][asyncHash] = result
-				#self.__addCallback(json.loads(data.content)['async-response-id'],callbackFn) # add callback function for response ID
-			#	print("response Code list = "+json.dumps(self.database))
-				return result
+			if   data.status_code == 200: #Successfully subscribed.
+				print "Channel has already been sucessfully subscribed to."
+				self.database['notifications'][endpoint][resource]=callbackFn
+				return True
+
+			elif data.status_code == 202: #Accepted. Asynchronous response ID.
+				if 'async-response-id' in json.loads(data.content).keys():
+					result = asyncResult(callbackFn)
+					result.next_step = "notifications"
+					result.extra = {"ep":endpoint, "path":resource}
+					asyncHash = json.loads(data.content)['async-response-id']
+					self.database['async-responses'][asyncHash] = result
+					#self.__addCallback(json.loads(data.content)['async-response-id'],callbackFn) # add callback function for response ID
+				#	print("response Code list = "+json.dumps(self.database))
+					return result
+			elif data.status_code == 404: # Endpoint or its resource not found.
+				return False
+			elif data.status_code == 412: # Cannot make a subscription for a non-observable resource.
+				return False
+			elif data.status_code == 413: # Cannot make a subscription due to failed precondition.
+				return False
+			elif data.status_code == 415: # Media type is not supported by the endpoint.
+				return False
+			elif data.status_code == 429: # Cannot make subscription request at the moment due to already ongoing other request for this endpoint or (for endpoints in queue mode) queue is full or queue was cleared because endpoint made full registration.
+				return False
+			elif data.status_code == 502: # Subscription failed.
+				return False
+			elif data.status_code == 503: # Subscription could not be established because endpoint is currently unavailable.
+				return False
+			elif data.status_code == 504: # Subscription could not be established due to a time-out from the endpoint.
+				return False
 		except:
 			print "\r\nsubscribeToResource failed"
 			ex_type, ex, tb = sys.exc_info()
@@ -210,7 +234,7 @@ class connector:
 		elif(noResp):
 			options="?noResp=true"
 		data = r.get(self.address+"/endpoints/"+endpoint+resource+options,headers={"Authorization":"Bearer "+self.bearer})
-		#print('getResource data = '+data.content)
+		print('getResource data = '+data.content)
 		try:
 			if( data.status_code == 202 and 'async-response-id' in json.loads(data.content).keys()):
 				#self.__addCallback(json.loads(data.content)['async-response-id'],callbackFn) # add callback function for response ID
@@ -238,10 +262,6 @@ class connector:
 	def postResource(self,endpoint,resource,dataIn):
 		data = r.post(self.address+"/endpoints/"+endpoint+resource,data=dataIn,headers={"Authorization":"Bearer "+self.bearer})
 		return {'data':json.loads(data.content),'status':data.status_code}
-
-
-	#TODO: write Event handler .on() for registrations, de-registrations, reg-updates, notifications
-	#on('registrations', callback)
 
 	# extend dictionary class so we can instantiate multiple levels at once
 	class vividict(dict):
