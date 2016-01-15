@@ -159,7 +159,7 @@ class connector:
 		data = self._putURL("/endpoints/"+ep+res,json=data)
 		if data.status_code == 200: #immediate success
 			result.error = False
-			result.isDone = True
+			result.is_done = True
 		elif data.status_code == 202:
 			self.database['async-responses'][json.loads(data.content)["async-response-id"]]= result
 		else:
@@ -177,7 +177,7 @@ class connector:
 		data = self._postURL("/endpoints/"+ep+res,data)
 		if data.status_code == 201: #immediate success
 			result.error = False
-			result.isDone = True
+			result.is_done = True
 		elif data.status_code == 202:
 			self.database['async-responses'][json.loads(data.content)["async-response-id"]]= result
 		else:
@@ -194,7 +194,7 @@ class connector:
 		data = self._deleteURL("/endpoints/"+ep)
 		if data.status_code == 200: #immediate success
 			result.error = False
-			result.isDone = True
+			result.is_done = True
 		elif data.status_code == 202:
 			self.database['async-responses'][json.loads(data.content)["async-response-id"]]= result
 		else:
@@ -204,9 +204,9 @@ class connector:
 		result.status_code = data.status_code
 		return result
 
-	# subscribe to endpoint/resource, the cbfn is given an asynch object that 
+	# subscribe to endpoint/resource, the cbfn is given an asynch object that
 	# represents the result. it is up to the user to impliment the notification
-	# channel callback in a higher level library. 
+	# channel callback in a higher level library.
 	def putResourceSubscription(self,ep,res,cbfn):
 		result = asyncResult(callback=cbfn)
 		result.endpoint = ep
@@ -214,7 +214,7 @@ class connector:
 		data = self._putURL("/subscriptions/"+ep+res)
 		if data.status_code == 200: #immediate success
 			result.error = False
-			result.isDone = True
+			result.is_done = True
 		elif data.status_code == 202:
 			self.database['async-responses'][json.loads(data.content)["async-response-id"]]= result
 		else:
@@ -230,7 +230,7 @@ class connector:
 		data = self._deleteURL("/subscriptions/"+ep)
 		if data.status_code == 200: #immediate success
 			result.error = False
-			result.isDone = True
+			result.is_done = True
 		else:
 			result.error = response_codes("delete_endpoint_subscription",data.status_code)
 			result.is_done = True
@@ -245,7 +245,7 @@ class connector:
 		data = self._deleteURL("/subscriptions/"+ep+res)
 		if data.status_code == 200: #immediate success
 			result.error = False
-			result.isDone = True
+			result.is_done = True
 		else:
 			result.error = response_codes("unsubscribe",data.status_code)
 			result.is_done = True
@@ -258,7 +258,7 @@ class connector:
 		data = self._deleteURL("/subscriptions/")
 		if data.status_code == 200: #immediate success
 			result.error = False
-			result.isDone = True
+			result.is_done = True
 		else:
 			result.error = response_codes("unsubscribe",data.status_code)
 			result.is_done = True
@@ -274,7 +274,7 @@ class connector:
 		data = self._getURL("/subscriptions/"+ep)
 		if data.status_code == 200: #immediate success
 			result.error = False
-			result.isDone = True
+			result.is_done = True
 			result.result = data.content
 		else:
 			result.error = response_codes("unsubscribe",data.status_code)
@@ -292,7 +292,7 @@ class connector:
 		data = self._getURL("/subscriptions/"+ep+res)
 		if data.status_code == 200: #immediate success
 			result.error = False
-			result.isDone = True
+			result.is_done = True
 			result.result = data.content
 		else:
 			result.error = response_codes("unsubscribe",data.status_code)
@@ -306,7 +306,7 @@ class connector:
 		data = self._putURL("/subscriptions",JSONdata, versioned=False)
 		if data.status_code == 200: #immediate success
 			result.error = False
-			result.isDone = True
+			result.is_done = True
 			result.result = data.content
 		else:
 			result.error = response_codes("presubscription",data.status_code)
@@ -320,7 +320,7 @@ class connector:
 		data = self._getURL("/subscriptions")
 		if data.status_code == 200: #immediate success
 			result.error = False
-			result.isDone = True
+			result.is_done = True
 			result.result = json.loads(data.content)
 		else:
 			result.error = response_codes("presubscription",data.status_code)
@@ -334,7 +334,7 @@ class connector:
 		data = self._putURL("/notification/callback",url)
 		if data.status_code == 204: #immediate success
 			result.error = False
-			result.isDone = True
+			result.is_done = True
 			result.result = data.content
 		else:
 			result.error = response_codes("put_callback_url",data.status_code)
@@ -348,7 +348,7 @@ class connector:
 		data = self._getURL("/notification/callback")
 		if data.status_code == 200: #immediate success
 			result.error = False
-			result.isDone = True
+			result.is_done = True
 			result.result = data.content
 		else:
 			result.error = response_codes("get_callback_url",data.status_code)
@@ -378,7 +378,7 @@ class connector:
 		data = self._deleteURL("/notification/callback")
 		if data.status_code == 204: #immediate success
 			result.error = False
-			result.isDone = True
+			result.is_done = True
 			result.result = data.content
 		else:
 			result.error = response_codes("delete_callback_url",data.status_code)
@@ -511,7 +511,7 @@ class connector:
 			return r.get(self.address+url,headers={"Authorization":"Bearer "+self.bearer},params=query)
 
 	# put data to URL with json payload in dataIn
-	def _putURL(self, url,payload,versioned=True):
+	def _putURL(self, url,payload="",versioned=True):
 		if self._isJSON(payload):
 			if versioned:
 				return r.put(self.address+self.apiVersion+url,json=payload,headers={"Authorization":"Bearer "+self.bearer})
