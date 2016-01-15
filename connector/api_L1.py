@@ -401,13 +401,22 @@ class connector:
 		else:
 			# start infinite longpolling thread
 			self.longPollThread.start()
+			self._stopLongPolling = False
 			print "Spun off LongPolling thread"
 		return self.longPollThread # return thread instance so user can manually intervene if necessary
+
+	# stop longpolling by switching the flag off.
+	def stopLongPolling(self):
+		if(self.longPollThread.isAlive()):
+			self._stopLongPolling = True
+		else:
+			print "LongPolling thread already stopped"
+		return
 
 	# Thread to constantly long poll connector and process the feedback.
 	# TODO: pass wait / noWait on to long polling thread, currently the user can set it but it doesnt actually affect anything.
 	def longPoll(self,wait = ""):
-		while True:
+		while not self._stopLongPolling:
 			try:
 				data = r.get(self.address+'/notification/pull'+wait,headers={"Authorization":"Bearer "+self.bearer})
 				# process callbacks
@@ -432,6 +441,7 @@ class connector:
 				traceback.print_tb(tb)
 				print sys.exc_info()
 				del tb
+		print "\r\n[Info longPoll] Killing Longpolling Thread"
 
 	# internal async-requests handler.
 	def _asyncHandler(self,data):
@@ -589,3 +599,5 @@ class connector:
 		self.reg_updates_callback = self._defaultHandler
 		self.registrations_callback = self._defaultHandler
 		self.notifications_callback = self._defaultHandler
+		# longpolling variable
+		self._stopLongPolling = True
