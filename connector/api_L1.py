@@ -397,12 +397,12 @@ class connector:
 			wait = "?noWait=true"
 		# check that there isn't another thread already running, only one longPolling instance per is acceptable
 		if(self.longPollThread.isAlive()):
-			print "LongPolling is already active."
+			print "[Warn] LongPolling is already active."
 		else:
 			# start infinite longpolling thread
 			self.longPollThread.start()
 			self._stopLongPolling = False
-			print "Spun off LongPolling thread"
+			print "[Info] Spun off LongPolling thread"
 		return self.longPollThread # return thread instance so user can manually intervene if necessary
 
 	# stop longpolling by switching the flag off.
@@ -410,13 +410,13 @@ class connector:
 		if(self.longPollThread.isAlive()):
 			self._stopLongPolling = True
 		else:
-			print "LongPolling thread already stopped"
+			print "[Warn] LongPolling thread already stopped"
 		return
 
 	# Thread to constantly long poll connector and process the feedback.
 	# TODO: pass wait / noWait on to long polling thread, currently the user can set it but it doesnt actually affect anything.
 	def longPoll(self,wait = ""):
-		while not self._stopLongPolling:
+		while self._stopLongPolling == False:
 			try:
 				data = r.get(self.address+'/notification/pull'+wait,headers={"Authorization":"Bearer "+self.bearer})
 				# process callbacks
@@ -600,4 +600,4 @@ class connector:
 		self.registrations_callback = self._defaultHandler
 		self.notifications_callback = self._defaultHandler
 		# longpolling variable
-		self._stopLongPolling = True
+		self._stopLongPolling = False # must initialize false to avoid race condition
