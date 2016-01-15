@@ -145,30 +145,247 @@ class connector:
 		elif data.status_code == 202:
 			self.database['async-responses'][json.loads(data.content)["async-response-id"]]= result
 		else: # fail
-			result.error = response_codes("get_resources",data.status_code)
+			result.error = response_codes("resource",data.status_code)
 			result.is_done = True
+		result.raw_data = data.content
+		result.status_code = data.status_code
 		return result
 
 	# return async object
-	def putResourceValue(self,ep,res,data):
-		result = asyncResult()
+	def putResourceValue(self,ep,res,data,cbfn=""):
+		result = asyncResult(callback=cbfn)
 		result.endpoint = ep
 		result.resource = res
-		data = self._putURL("/endpoints/"+ep+res,json=data, versioned=False)
+		data = self._putURL("/endpoints/"+ep+res,json=data)
 		if data.status_code == 200: #immediate success
 			result.error = False
 			result.isDone = True
 		elif data.status_code == 202:
 			self.database['async-responses'][json.loads(data.content)["async-response-id"]]= result
 		else:
-			result.error = response_codes("get_resources",data.status_code)
+			result.error = response_codes("resource",data.status_code)
 			result.is_done = True
 		result.raw_data = data.content
 		result.status_code = data.status_code
 		return result
 
+	#return async object
+	def postResource(self,ep,res,data="",cbfn=""):
+		result = asyncResult(callback=cbfn)
+		result.endpoint = ep
+		result.resource = res
+		data = self._postURL("/endpoints/"+ep+res,data)
+		if data.status_code == 201: #immediate success
+			result.error = False
+			result.isDone = True
+		elif data.status_code == 202:
+			self.database['async-responses'][json.loads(data.content)["async-response-id"]]= result
+		else:
+			result.error = response_codes("resource",data.status_code)
+			result.is_done = True
+		result.raw_data = data.content
+		result.status_code = data.status_code
+		return result
+
+	# return async object
+	def deleteEndpoint(self,ep,cbfn=""):
+		result = asyncResult(callback=cbfn)
+		result.endpoint = ep
+		data = self._deleteURL("/endpoints/"+ep)
+		if data.status_code == 200: #immediate success
+			result.error = False
+			result.isDone = True
+		elif data.status_code == 202:
+			self.database['async-responses'][json.loads(data.content)["async-response-id"]]= result
+		else:
+			result.error = response_codes("resource",data.status_code)
+			result.is_done = True
+		result.raw_data = data.content
+		result.status_code = data.status_code
+		return result
+
+	# subscribe to endpoint/resource, the cbfn is given an asynch object that 
+	# represents the result. it is up to the user to impliment the notification
+	# channel callback in a higher level library. 
+	def putResourceSubscription(self,ep,res,cbfn):
+		result = asyncResult(callback=cbfn)
+		result.endpoint = ep
+		result.resource = res
+		data = self._putURL("/subscriptions/"+ep+res)
+		if data.status_code == 200: #immediate success
+			result.error = False
+			result.isDone = True
+		elif data.status_code == 202:
+			self.database['async-responses'][json.loads(data.content)["async-response-id"]]= result
+		else:
+			result.error = response_codes("subscribe",data.status_code)
+			result.is_done = True
+		result.raw_data = data.content
+		result.status_code = data.status_code
+		return result
+
+	def deleteEnpointSubscriptions(self,ep):
+		result = asyncResult()
+		result.endpoint = ep
+		data = self._deleteURL("/subscriptions/"+ep)
+		if data.status_code == 200: #immediate success
+			result.error = False
+			result.isDone = True
+		else:
+			result.error = response_codes("delete_endpoint_subscription",data.status_code)
+			result.is_done = True
+		result.raw_data = data.content
+		result.status_code = data.status_code
+		return result
+
+	def deleteResourceSubscription(self,ep,res):
+		result = asyncResult()
+		result.endpoint = ep
+		result.resource = res
+		data = self._deleteURL("/subscriptions/"+ep+res)
+		if data.status_code == 200: #immediate success
+			result.error = False
+			result.isDone = True
+		else:
+			result.error = response_codes("unsubscribe",data.status_code)
+			result.is_done = True
+		result.raw_data = data.content
+		result.status_code = data.status_code
+		return result
+
+	def deleteAllSubscriptions(self):
+		result = asyncResult()
+		data = self._deleteURL("/subscriptions/")
+		if data.status_code == 200: #immediate success
+			result.error = False
+			result.isDone = True
+		else:
+			result.error = response_codes("unsubscribe",data.status_code)
+			result.is_done = True
+		result.raw_data = data.content
+		result.status_code = data.status_code
+		return result
+
+	# return async object
+	# result field is a string
+	def getEndpointSubscriptions(self,ep):
+		result = asyncResult()
+		result.endpoint = ep
+		data = self._getURL("/subscriptions/"+ep)
+		if data.status_code == 200: #immediate success
+			result.error = False
+			result.isDone = True
+			result.result = data.content
+		else:
+			result.error = response_codes("unsubscribe",data.status_code)
+			result.is_done = True
+		result.raw_data = data.content
+		result.status_code = data.status_code
+		return result
+
+	# return async object
+	# result field is a string
+	def getResourceSubscription(self,ep,res):
+		result = asyncResult()
+		result.endpoint = ep
+		result.resource = res
+		data = self._getURL("/subscriptions/"+ep+res)
+		if data.status_code == 200: #immediate success
+			result.error = False
+			result.isDone = True
+			result.result = data.content
+		else:
+			result.error = response_codes("unsubscribe",data.status_code)
+			result.is_done = True
+		result.raw_data = data.content
+		result.status_code = data.status_code
+		return result
+
+	def putPreSubscription(self,JSONdata):
+		result = asyncResult()
+		data = self._putURL("/subscriptions",JSONdata, versioned=False)
+		if data.status_code == 200: #immediate success
+			result.error = False
+			result.isDone = True
+			result.result = data.content
+		else:
+			result.error = response_codes("presubscription",data.status_code)
+			result.is_done = True
+		result.raw_data = data.content
+		result.status_code = data.status_code
+		return result
+
+	def getPreSubscription(self):
+		result = asyncResult()
+		data = self._getURL("/subscriptions")
+		if data.status_code == 200: #immediate success
+			result.error = False
+			result.isDone = True
+			result.result = json.loads(data.content)
+		else:
+			result.error = response_codes("presubscription",data.status_code)
+			result.is_done = True
+		result.raw_data = data.content
+		result.status_code = data.status_code
+		return result
+
+	def putCallbackURL(self,url):
+		result = asyncResult()
+		data = self._putURL("/notification/callback",url)
+		if data.status_code == 204: #immediate success
+			result.error = False
+			result.isDone = True
+			result.result = data.content
+		else:
+			result.error = response_codes("put_callback_url",data.status_code)
+			result.is_done = True
+		result.raw_data = data.content
+		result.status_code = data.status_code
+		return result
+
+	def getCallbackURL(self):
+		result = asyncResult()
+		data = self._getURL("/notification/callback")
+		if data.status_code == 200: #immediate success
+			result.error = False
+			result.isDone = True
+			result.result = data.content
+		else:
+			result.error = response_codes("get_callback_url",data.status_code)
+			result.is_done = True
+		result.raw_data = data.content
+		result.status_code = data.status_code
+		return result
+
+	# set a specific handler to call the cbfn
+	def setHandler(self,handler,cbfn):
+		if handler == "async-responses":
+			self.async_responses_callback = cbfn
+		if handler == "registrations-expired":
+			self.registrations_expired_callback = cbfn
+		if handler == "de-registrations":
+			self.de_registrations_callback = cbfn
+		if handler == "reg-updates":
+			self.reg_updates_callback = cbfn
+		if handler == "registrations":
+			self.registrations_callback = cbfn
+		if handler == "notifications":
+			self.notifications_callback = cbfn
 
 
+	def deleteCallbackURL(self):
+		result = asyncResult()
+		data = self._deleteURL("/notification/callback")
+		if data.status_code == 204: #immediate success
+			result.error = False
+			result.isDone = True
+			result.result = data.content
+		else:
+			result.error = response_codes("delete_callback_url",data.status_code)
+			result.is_done = True
+		result.raw_data = data.content
+		result.status_code = data.status_code
+		return result
 
 	# this function needs to spin off a thread that is constantally polling,
 	# should match asynch ID's to values and call their function
@@ -294,12 +511,47 @@ class connector:
 			return r.get(self.address+url,headers={"Authorization":"Bearer "+self.bearer},params=query)
 
 	# put data to URL with json payload in dataIn
-	def _putURL(self, url,json={},versioned=True):
-		if versioned:
-			return r.put(self.address+self.apiVersion+url,data=json,headers={"Authorization":"Bearer "+self.bearer})
+	def _putURL(self, url,payload,versioned=True):
+		if self._isJSON(payload):
+			if versioned:
+				return r.put(self.address+self.apiVersion+url,json=payload,headers={"Authorization":"Bearer "+self.bearer})
+			else:
+				return r.put(self.address+url,json=payload,headers={"Authorization":"Bearer "+self.bearer})
 		else:
-			return r.put(self.address+url,data=json,headers={"Authorization":"Bearer "+self.bearer})
+			if versioned:
+				return r.put(self.address+self.apiVersion+url,data=payload,headers={"Authorization":"Bearer "+self.bearer})
+			else:
+				return r.put(self.address+url,data=payload,headers={"Authorization":"Bearer "+self.bearer})
 
+	# put data to URL with json payload in dataIn
+	def _postURL(self, url,payload="",versioned=True):
+		if self._isJSON(payload):
+			if versioned:
+				return r.post(self.address+self.apiVersion+url,json=payload,headers={"Authorization":"Bearer "+self.bearer})
+			else:
+				return r.post(self.address+url,json=payload,headers={"Authorization":"Bearer "+self.bearer})
+		else:
+			if versioned:
+				return r.post(self.address+self.apiVersion+url,data=payload,headers={"Authorization":"Bearer "+self.bearer})
+			else:
+				return r.post(self.address+url,data=payload,headers={"Authorization":"Bearer "+self.bearer})
+
+	# delete endpoint
+	def _deleteURL(self, url,versioned=True):
+		if versioned:
+			return r.delete(self.address+self.apiVersion+url,headers={"Authorization":"Bearer "+self.bearer})
+		else:
+			return r.delete(self.address+url,headers={"Authorization":"Bearer "+self.bearer})
+
+
+	# check if input is json, return true or false accordingly
+	def _isJSON(self,dataIn):
+		try:
+			json.dumps(dataIn)
+			return True
+		except:
+			print("[_isJSON] exception triggered, input is not json")
+			return False
 
 	# extend dictionary class so we can instantiate multiple levels at once
 	class vividict(dict):
