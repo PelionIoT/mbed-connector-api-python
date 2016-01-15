@@ -53,10 +53,9 @@ class test_connector_live:
 
 	# test the getResources function
 	def test_getResources(self):
-		ep = self.connector.getEndpoints()
+		ep = self.connector.getEndpoints() # get list of endpoints
 		assert ep.error == False
-
-		x = self.connector.getResources(ep.result[])
+		x = self.connector.getResources(ep.result[0]['name']) # use first endpoint returned
 		self.waitOnAsync(x)
 		assert x.error == False
 
