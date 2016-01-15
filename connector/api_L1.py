@@ -207,7 +207,7 @@ class connector:
 	# subscribe to endpoint/resource, the cbfn is given an asynch object that
 	# represents the result. it is up to the user to impliment the notification
 	# channel callback in a higher level library.
-	def putResourceSubscription(self,ep,res,cbfn):
+	def putResourceSubscription(self,ep,res,cbfn=""):
 		result = asyncResult(callback=cbfn)
 		result.endpoint = ep
 		result.resource = res
