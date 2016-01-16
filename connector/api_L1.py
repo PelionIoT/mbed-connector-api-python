@@ -28,14 +28,14 @@ class asyncResult:
 				if isinstance(data.content,str): # string handler
 					self.result = data.content
 				elif isinstance(data.content,int): # int handler
-					print "data returned is an integer, not sure what to do with that"
+					self.log.debug("data returned is an integer, not sure what to do with that")
 				else: # all other handler
-					print "unhandled data type, type of content : %s" %type(data.content)
+					self.log.debug("unhandled data type, type of content : %s" %type(data.content))
 			self.status_code = data.status_code
 			self.raw_data = data.content
 		else:
 			#error
-			print("type not found : %s"%type(data))
+			self.log.error("type not found : %s"%type(data))
 		return
 
 	def __init__(self, callback=""):
@@ -398,12 +398,12 @@ class connector:
 			wait = "?noWait=true"
 		# check that there isn't another thread already running, only one longPolling instance per is acceptable
 		if(self.longPollThread.isAlive()):
-			print "[Warn] LongPolling is already active."
+			self.log.warn("[Warn] LongPolling is already active.")
 		else:
 			# start infinite longpolling thread
 			self.longPollThread.start()
 			self._stopLongPolling = False
-			self.log.info("[Info] Spun off LongPolling thread")
+			self.log.info("Spun off LongPolling thread")
 		return self.longPollThread # return thread instance so user can manually intervene if necessary
 
 	# stop longpolling by switching the flag off.
@@ -411,7 +411,7 @@ class connector:
 		if(self.longPollThread.isAlive()):
 			self._stopLongPolling = True
 		else:
-			print "[Warn] LongPolling thread already stopped"
+			self.log.warn("[Warn] LongPolling thread already stopped")
 		return
 
 	# Thread to constantly long poll connector and process the feedback.
@@ -434,12 +434,12 @@ class connector:
 						self.de_registrations_callback(data)
 					if 'registrations-expired' in json.loads(data.content).keys():
 						self.registrations_expired_callback(data)
-					#print("data = "+data.content)
+					#self.log.debug("data = "+data.content)
 			except:
-				self.log.error("\r\n[Error longPoll] failed to parse returned goodness")
+				self.log.error("\r\n failed to parse returned goodness")
 				ex_type, ex, tb = sys.exc_info()
 				traceback.print_tb(tb)
-				print sys.exc_info()
+				self.log.error(sys.exc_info())
 				del tb
 		self.log.info("\r\n[Info longPoll] Killing Longpolling Thread")
 
@@ -454,7 +454,7 @@ class connector:
 
 	# internal async-requests handler.
 	def _asyncHandler(self,data):
-		print ("[DBG _asyncHandler] called, data =  %s" %str(data.content))
+		self.log.debug("data =  %s" %str(data.content))
 		try:
 			payload = json.loads(data.content)
 			responses = payload['async-responses']
@@ -481,15 +481,15 @@ class connector:
 						if result.callback:
 							result.callback(result)
 						else:
-							print "[WARN: _asyncHandler] No callback function given"
+							self.log.warn("No callback function given")
 				#else:
 					# TODO : object not found int asynch database
 		except:
 			# TODO error handling here
-			print "\r\n[Error _asyncHandler] bad data encountered and failed to elegantly handle it. "
+			self.log.error("\r\n[Error _asyncHandler] bad data encountered and failed to elegantly handle it. ")
 			ex_type, ex, tb = sys.exc_info()
 			traceback.print_tb(tb)
-			print sys.exc_info()
+			self.log.error(sys.exc_info())
 			del tb
 			return
 
@@ -498,24 +498,24 @@ class connector:
 	# a L2 implimentation
 	def _defaultHandler(self,data):
 		if 'async-responses' in json.loads(data.content).keys():
-			print "\r\n[Default Handler] async-responses detected : "
-			print json.loads(data.content)["async-responses"]
+			self.log.debug("\r\n[Default Handler] async-responses detected : ")
+			self.log.debug(json.loads(data.content)["async-responses"])
 		if 'notifications' in json.loads(data.content).keys():
-			print "\r\n[Default Handler] notifications' detected : "
-			print json.loads(data.content)["notifications"]
+			self.log.debug("\r\n[Default Handler] notifications' detected : ")
+			self.log.debug(json.loads(data.content)["notifications"])
 		if 'registrations' in json.loads(data.content).keys():
-			print "\r\n[Default Handler] registrations' detected : "
-			print json.loads(data.content)["registrations"]
+			self.log.debug("\r\n[Default Handler] registrations' detected : ")
+			self.log.debug(json.loads(data.content)["registrations"])
 		#if 'reg-updates' in json.loads(data.content).keys():
 			# removed because this happens every 10s or so, spamming the output
-			#print "\r\n[Default Handler] reg-updates detected : "
-			#print json.loads(data.content)["reg-updates"]
+			#self.log.debug("\r\n[Default Handler] reg-updates detected : ")
+			#self.log.debug(json.loads(data.content)["reg-updates"])
 		if 'de-registrations' in json.loads(data.content).keys():
-			print "\r\n[Default Handler] de-registrations detected : "
-			print json.loads(data.content)["de-registrations"]
+			self.log.debug("\r\n[Default Handler] de-registrations detected : ")
+			self.log.debug(json.loads(data.content)["de-registrations"])
 		if 'registrations-expired' in json.loads(data.content).keys():
-			print "\r\n[Default Handler] registrations-expired detected : "
-			print json.loads(data.content)["registrations-expired"]
+			self.log.debug("\r\n[Default Handler] registrations-expired detected : ")
+			self.log.debug(json.loads(data.content)["registrations-expired"])
 
 	# make the requests.
 	# url is the API url to hit
@@ -569,7 +569,7 @@ class connector:
 			json.dumps(dataIn)
 			return True
 		except:
-			print("[_isJSON] exception triggered, input is not json")
+			self.log.debug("[_isJSON] exception triggered, input is not json")
 			return False
 
 	# extend dictionary class so we can instantiate multiple levels at once
