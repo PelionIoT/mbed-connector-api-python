@@ -4,6 +4,7 @@
 # See LICENSE file for details.
 
 import api_L1
+from nose.tools import *
 
 # ToDo : change this to make the token pass in through other options
 token = "CHXKYI7AN334D5WQI9DU9PMMDR8G6VPX3763LOT6"
@@ -28,30 +29,35 @@ class test_connector_live:
 		return
 
 	# test the getLimits function
+	@timed(5)
 	def test_getLimits(self):
 		x = self.connector.getLimits()
 		self.waitOnAsync(x)
 		assert x.error == False # check for errors
 
 	# test the getConnectorVersion function	
+	@timed(5)
 	def test_getConnectorVersion(self):
 		x = self.connector.getConnectorVersion()
 		self.waitOnAsync(x)
 		assert x.error == False
 
 	# test the getApiVersion function
+	@timed(5)
 	def test_getApiVersion(self):
 		x = self.connector.getApiVersion()
 		self.waitOnAsync(x)
 		assert x.error == False
 
 	# test the getEndpoints function
+	@timed(10)
 	def test_getEndpoints(self):
 		x = self.connector.getEndpoints()
 		self.waitOnAsync(x)
 		assert x.error == False
 
 	# test the getResources function
+	@timed(10)
 	def test_getResources(self):
 		ep = self.connector.getEndpoints() # get list of endpoints
 		assert ep.error == False
