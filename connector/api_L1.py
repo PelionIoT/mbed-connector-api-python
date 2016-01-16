@@ -9,6 +9,7 @@ import threading
 import sys
 import traceback
 from connectorError import response_codes
+import logging
 
 class asyncResult:
 	"""For use as part of connector library calls that make asycnronous calls.
@@ -402,7 +403,7 @@ class connector:
 			# start infinite longpolling thread
 			self.longPollThread.start()
 			self._stopLongPolling = False
-			print "[Info] Spun off LongPolling thread"
+			self.log.info("[Info] Spun off LongPolling thread")
 		return self.longPollThread # return thread instance so user can manually intervene if necessary
 
 	# stop longpolling by switching the flag off.
@@ -435,13 +436,21 @@ class connector:
 						self.registrations_expired_callback(data)
 					#print("data = "+data.content)
 			except:
-				# TODO: debug print statements here
-				print "\r\n[Error longPoll] failed to parse returned goodness"
+				self.log.error("\r\n[Error longPoll] failed to parse returned goodness")
 				ex_type, ex, tb = sys.exc_info()
 				traceback.print_tb(tb)
 				print sys.exc_info()
 				del tb
-		print "\r\n[Info longPoll] Killing Longpolling Thread"
+		self.log.info("\r\n[Info longPoll] Killing Longpolling Thread")
+
+	# Turn on / off debug messages based on the onOff variable
+	def debug(self,onOff):
+		if onOff:
+			self.log.setLevel(logging.DEBUG)
+			self._ch.setLevel(logging.DEBUG)
+		else:
+			self.log.setLevel(logging.ERROR)
+			self._ch.setLevel(logging.ERROR)
 
 	# internal async-requests handler.
 	def _asyncHandler(self,data):
@@ -601,3 +610,12 @@ class connector:
 		self.notifications_callback = self._defaultHandler
 		# longpolling variable
 		self._stopLongPolling = False # must initialize false to avoid race condition
+		# add logger 
+		self.log = logging.getLogger(name="mbed-connector-logger")
+		self.log.setLevel(logging.ERROR)
+		self._ch = logging.StreamHandler()
+		self._ch.setLevel(logging.ERROR)
+		formatter = logging.Formatter("[%(levelname)s \t %(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s")
+		self._ch.setFormatter(formatter)
+		self.log.addHandler(self._ch)
+
