@@ -398,7 +398,7 @@ class connector:
 			wait = "?noWait=true"
 		# check that there isn't another thread already running, only one longPolling instance per is acceptable
 		if(self.longPollThread.isAlive()):
-			self.log.warn("[Warn] LongPolling is already active.")
+			self.log.warn("LongPolling is already active.")
 		else:
 			# start infinite longpolling thread
 			self.longPollThread.start()
@@ -411,7 +411,7 @@ class connector:
 		if(self.longPollThread.isAlive()):
 			self._stopLongPolling = True
 		else:
-			self.log.warn("[Warn] LongPolling thread already stopped")
+			self.log.warn("LongPolling thread already stopped")
 		return
 
 	# Thread to constantly long poll connector and process the feedback.
@@ -441,7 +441,7 @@ class connector:
 				traceback.print_tb(tb)
 				self.log.error(sys.exc_info())
 				del tb
-		self.log.info("\r\n[Info longPoll] Killing Longpolling Thread")
+		self.log.info("Killing Longpolling Thread")
 
 	# Turn on / off debug messages based on the onOff variable
 	def debug(self,onOff):
@@ -486,7 +486,7 @@ class connector:
 					# TODO : object not found int asynch database
 		except:
 			# TODO error handling here
-			self.log.error("\r\n[Error _asyncHandler] bad data encountered and failed to elegantly handle it. ")
+			self.log.error("Bad data encountered and failed to elegantly handle it. ")
 			ex_type, ex, tb = sys.exc_info()
 			traceback.print_tb(tb)
 			self.log.error(sys.exc_info())
