@@ -60,9 +60,79 @@ class test_connector_live:
 	@timed(10)
 	def test_getResources(self):
 		ep = self.connector.getEndpoints() # get list of endpoints
+		self.waitOnAsync(ep)
 		assert ep.error == False
+		if not ep.result:
+			ok_(ep.result,msg="There are no endpoints on the domain, thus we cannot get resources. Please make sure to connect a endpoint to the domain that has a readable resource.")
 		x = self.connector.getResources(ep.result[0]['name']) # use first endpoint returned
 		self.waitOnAsync(x)
 		assert x.error == False
 
+	@timed(10)
+	def test_getResourceValue(self):
+		ep = self.connector.getEndpoints()
+		self.waitOnAsync(ep)
+		ok_(ep.error == False, msg="There was an error getting the list of endpoints on the domain")
+		res = self.connector.getResources(ep.result[0]['name'])
+		self.waitOnAsync(res)
+		ok_(ep.error == False, msg="There was an error getting the list of resources for the endpoint")
+		x = self.connector.getResourceValue(ep.result[0]['name'], res.result[0]['uri'])
+		self.waitOnAsync(x)
+		assert x.error == False
+
+	@timed(10)
+	def test_postResource(self):
+		return
+
+	@timed(10)
+	def test_deleteEndpoint(self):
+		return
+
+	@timed(10)
+	def test_putResourceSubscription(self):
+		return
+
+	@timed(10)
+	def test_deleteSubscription(self):
+		return
+
+	@timed(10)
+	def test_deleteEnpointSubscriptions(self):
+		return
+
+	@timed(10)
+	def test_deleteResourceSubscription(self):
+		return
+
+	@timed(10)
+	def test_deleteAllSubscriptions(self):
+		return
+
+	@timed(10)
+	def test_getEndpointSubscriptions(self):
+		return
+
+	@timed(10)
+	def test_getResourceSubscription(self):
+		return
+
+	@timed(10)
+	def test_putPreSubscription(self):
+		return
+
+	@timed(10)
+	def test_getPreSubscription(self):
+		return
+
+	@timed(10)
+	def test_putCallbackURL(self):
+		return
+
+	@timed(10)
+	def test_getCallbackURL(self):
+		return
+
+	@timed(10)
+	def test_deleteCallbackURL(self):
+		return
 
