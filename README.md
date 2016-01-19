@@ -27,9 +27,9 @@ x.startLongPolling()
 # Use 
 x.getEndpoints() # returns a  list of all endpoints on your domain
 x.getResources("EndpointName") # returns all resources of an endpoint
-x.putResource("EndpointName","Resource","Value") # send the "Value" to the "Resource" over a PUT request
-x.postResource("EndpointName","Resource","Value") # send the "Value" to the "Resource" over a POST request
-y = x.getResource("EndpointName","Resource")  # check the y.isDone() funciton to see when the request completes, the result will then be in y.result. The Resource should be of the form "/X/Y/Z"
+x.putResourceValue("EndpointName","Resource","Value") # send the "Value" to the "Resource" over a PUT request
+x.postResourceValue("EndpointName","Resource","Value") # send the "Value" to the "Resource" over a POST request
+y = x.getResourceValue("EndpointName","Resource")  # check the y.isDone() funciton to see when the request completes, the result will then be in y.result. The Resource should be of the form "/X/Y/Z"
 if y.isDone():
     print "The value of y is " +str(y.result)
 
@@ -41,13 +41,20 @@ def callbackFn(dataIn, rawData):
     print "data : " +str(dataIn)
     print "raw JSON Data : " +str(rawData)
 
-x.getResource("EndpointName","Resource",callbackFn)
+x.getResourceValue("EndpointName","Resource",callbackFn)
 
 ##########
 
 x.subscribeToResource("Endpoint","Resource",callbackFN) # This will call the callbackFn every time the Endpoint/Resource value changes.
 
 ```
+
+## Extras
+#### Debug
+This module uses the logging module. To enable more robust debugging initialize your object instance and then use the `.debug(True)` method to enable more robust debugging of the module
+
+## Requirements
+This module uses the `requests` library. If you do not have it installed please install it. 
 
 ## License
 Apache 2.0
