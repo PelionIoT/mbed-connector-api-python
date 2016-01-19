@@ -82,57 +82,71 @@ class test_connector_live:
 
 	@timed(10)
 	def test_postResource(self):
+		#TODO
 		return
 
 	@timed(10)
 	def test_deleteEndpoint(self):
+		#TODO
 		return
 
 	@timed(10)
 	def test_putResourceSubscription(self):
+		#TODO
 		return
 
 	@timed(10)
 	def test_deleteSubscription(self):
+		#TODO
 		return
 
 	@timed(10)
 	def test_deleteEnpointSubscriptions(self):
+		#TODO
 		return
 
 	@timed(10)
 	def test_deleteResourceSubscription(self):
+		#TODO
 		return
 
 	@timed(10)
 	def test_deleteAllSubscriptions(self):
+		#TODO
 		return
 
 	@timed(10)
 	def test_getEndpointSubscriptions(self):
+		#TODO
 		return
 
 	@timed(10)
 	def test_getResourceSubscription(self):
+		#TODO
 		return
 
 	@timed(10)
 	def test_putPreSubscription(self):
+		#TODO
 		return
 
 	@timed(10)
 	def test_getPreSubscription(self):
+		#TODO
 		return
 
 	@timed(10)
 	def test_putCallbackURL(self):
+		#TODO
 		return
 
 	@timed(10)
 	def test_getCallbackURL(self):
+		#TODO
 		return
 
 	@timed(10)
 	def test_deleteCallbackURL(self):
+		#TODO
 		return
 
