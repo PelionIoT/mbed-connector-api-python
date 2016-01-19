@@ -330,7 +330,7 @@ class connector:
 		result.status_code = data.status_code
 		return result
 
-	def putCallbackURL(self,url):
+	def putCallback(self,url,headers=""):
 		result = asyncResult()
 		data = self._putURL("/notification/callback",url)
 		if data.status_code == 204: #immediate success
@@ -344,7 +344,7 @@ class connector:
 		result.status_code = data.status_code
 		return result
 
-	def getCallbackURL(self):
+	def getCallback(self):
 		result = asyncResult()
 		data = self._getURL("/notification/callback")
 		if data.status_code == 200: #immediate success
@@ -374,7 +374,7 @@ class connector:
 			self.notifications_callback = cbfn
 
 
-	def deleteCallbackURL(self):
+	def deleteCallback(self):
 		result = asyncResult()
 		data = self._deleteURL("/notification/callback")
 		if data.status_code == 204: #immediate success
@@ -436,7 +436,7 @@ class connector:
 						self.registrations_expired_callback(data)
 					#self.log.debug("data = "+data.content)
 			except:
-				self.log.error("\r\n failed to parse returned goodness")
+				self.log.error("\r\n longPolling failed to parse returned goodness")
 				ex_type, ex, tb = sys.exc_info()
 				traceback.print_tb(tb)
 				self.log.error(sys.exc_info())
