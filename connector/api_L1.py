@@ -142,7 +142,9 @@ class connector:
 		if data.status_code == 200: # immediate success
 			result.error = False
 			result.is_done = True
-			return cbfn(result)
+			if cbfn:
+				cbfn(result)
+			return result
 		elif data.status_code == 202:
 			self.database['async-responses'][json.loads(data.content)["async-response-id"]]= result
 		else: # fail
