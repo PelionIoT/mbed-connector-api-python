@@ -9,7 +9,7 @@ import httpretty
 from sure import expect
 from nose.tools import *
 from mock_data import mockData 
-
+import re
 # ToDo : change this to make the token pass in through other options
 token = "CHXKYI7AN334D5WQI9DU9PMMDR8G6VPX3763LOT6"
 
@@ -25,8 +25,8 @@ class test_connector_mock:
 
 	# this function is called after every test function in this class
 	# stop longpolling
-	def tearDown(self):
-		self.connector.stopLongPolling()
+	#def tearDown(self):
+		#self.connector.stopLongPolling()
 
 	# This function takes an async object and waits untill it is completed
 	def waitOnAsync(self,asyncObject):
@@ -34,7 +34,7 @@ class test_connector_mock:
 			None
 		return
 
-	# test the getLimits function
+	# test the getLimits function GET /limits
 	def test_getLimits(self):
 		httpretty.register_uri(httpretty.GET,"mock://mock/limits",
 								body=self.md.getPayload('limits'),
@@ -45,17 +45,8 @@ class test_connector_mock:
 		expect(x.isDone()).to.equal(True)
 		expect(x.status_code).to.equal(200)
 
+	# test the getConnectorVersion function, GET /
 	def test_getConnectorVersion(self):
-		httpretty.register_uri(httpretty.GET,"mock://mock/limits",
-								body=self.md.getPayload('limits'),
-								status=self.md.getStatusCode('limits'))
-		x = self.connector.getLimits()
-		self.waitOnAsync(x)
-		expect(x.error).to.equal(False)
-		expect(x.isDone()).to.equal(True)
-		expect(x.status_code).to.equal(200)
-
-	def test_getApiVersion(self):
 		httpretty.register_uri(httpretty.GET,"mock://mock/",
 								body=self.md.getPayload('connectorVersion'),
 								status=self.md.getStatusCode('connectorVersion'))
@@ -65,21 +56,41 @@ class test_connector_mock:
 		expect(x.isDone()).to.equal(True)
 		expect(x.status_code).to.equal(200)
 
-	def test_getEndpoints(self):
-		httpretty.register_uri(httpretty.GET,"mock://mock/limits",
-								body=self.md.getPayload('limits'),
-								status=self.md.getStatusCode('limits'))
-		x = self.connector.getLimits()
+	# test the getAPIVersion funciton, GET /rest-version
+	def test_getApiVersion(self):
+		httpretty.register_uri(httpretty.GET,"mock://mock/rest-versions",
+								body=self.md.getPayload('apiVersion'),
+								status=self.md.getStatusCode('apiVersion'))
+		x = self.connector.getApiVersion()
 		self.waitOnAsync(x)
 		expect(x.error).to.equal(False)
 		expect(x.isDone()).to.equal(True)
 		expect(x.status_code).to.equal(200)
 
+	# test the getEndpoints function, GET /endpoints
+	def test_getEndpoints(self):
+		httpretty.register_uri(httpretty.GET,"mock://mock/endpoints",
+								body=self.md.getPayload('endpoints'),
+								status=self.md.getStatusCode('endpoints'))
+		x = self.connector.getEndpoints()
+		self.waitOnAsync(x)
+		expect(x.error).to.equal(False)
+		expect(x.isDone()).to.equal(True)
+		expect(x.status_code).to.equal(200)
+
+	# test the getResources function, GET /endpoints/{endpoint}
 	def test_getResources(self):
-		httpretty.register_uri(httpretty.GET,"mock://mock/limits",
-								body=self.md.getPayload('limits'),
-								status=self.md.getStatusCode('limits'))
-		x = self.connector.getLimits()
+		httpretty.register_uri(httpretty.GET,"mock://mock/endpoints",
+								body=self.md.getPayload('endpoints'),
+								status=self.md.getStatusCode('endpoints'))
+		httpretty.register_uri(httpretty.GET,re.compile(".*/endpoints/[a-zA-Z0-9\-]*"),
+								body=self.md.getPayload('resources'),
+								status=self.md.getStatusCode('resources'))
+		ep = self.connector.getEndpoints()
+		self.waitOnAsync(ep)
+		expect(ep.error).to.equal(False)
+		print ep.result
+		x = self.connector.getResources(ep.result[0]['name'])
 		self.waitOnAsync(x)
 		expect(x.error).to.equal(False)
 		expect(x.isDone()).to.equal(True)
