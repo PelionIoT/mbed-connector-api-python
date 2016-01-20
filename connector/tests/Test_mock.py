@@ -44,3 +44,43 @@ class test_connector_mock:
 		expect(x.error).to.equal(False)
 		expect(x.isDone()).to.equal(True)
 		expect(x.status_code).to.equal(200)
+
+	def test_getConnectorVersion(self):
+		httpretty.register_uri(httpretty.GET,"mock://mock/limits",
+								body=self.md.getPayload('limits'),
+								status=self.md.getStatusCode('limits'))
+		x = self.connector.getLimits()
+		self.waitOnAsync(x)
+		expect(x.error).to.equal(False)
+		expect(x.isDone()).to.equal(True)
+		expect(x.status_code).to.equal(200)
+
+	def test_getApiVersion(self):
+		httpretty.register_uri(httpretty.GET,"mock://mock/",
+								body=self.md.getPayload('connectorVersion'),
+								status=self.md.getStatusCode('connectorVersion'))
+		x = self.connector.getConnectorVersion()
+		self.waitOnAsync(x)
+		expect(x.error).to.equal(False)
+		expect(x.isDone()).to.equal(True)
+		expect(x.status_code).to.equal(200)
+
+	def test_getEndpoints(self):
+		httpretty.register_uri(httpretty.GET,"mock://mock/limits",
+								body=self.md.getPayload('limits'),
+								status=self.md.getStatusCode('limits'))
+		x = self.connector.getLimits()
+		self.waitOnAsync(x)
+		expect(x.error).to.equal(False)
+		expect(x.isDone()).to.equal(True)
+		expect(x.status_code).to.equal(200)
+
+	def test_getResources(self):
+		httpretty.register_uri(httpretty.GET,"mock://mock/limits",
+								body=self.md.getPayload('limits'),
+								status=self.md.getStatusCode('limits'))
+		x = self.connector.getLimits()
+		self.waitOnAsync(x)
+		expect(x.error).to.equal(False)
+		expect(x.isDone()).to.equal(True)
+		expect(x.status_code).to.equal(200)
