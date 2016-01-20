@@ -95,3 +95,62 @@ class test_connector_mock:
 		expect(x.error).to.equal(False)
 		expect(x.isDone()).to.equal(True)
 		expect(x.status_code).to.equal(200)
+
+
+	# TODO: remainder of mocking implementations and impliment the asynch callback mechanism
+
+	#def test_postResource(self):
+	#	#TODO
+	#	return
+	
+	#def test_deleteEndpoint(self):
+	#	#TODO
+	#	return
+	
+	#def test_putResourceSubscription(self):
+	#	#TODO
+	#	return
+	
+	#def test_deleteSubscription(self):
+	#	#TODO
+	#	return
+	
+	#def test_deleteEnpointSubscriptions(self):
+	#	#TODO
+	#	return
+	
+	#def test_deleteResourceSubscription(self):
+	#	#TODO
+	#	return
+	
+	#def test_deleteAllSubscriptions(self):
+	#	#TODO
+	#	return
+	
+	#def test_getEndpointSubscriptions(self):
+	#	#TODO
+	#	return
+	
+	#def test_getResourceSubscription(self):
+	#	#TODO
+	#	return
+	
+	#def test_putPreSubscription(self):
+	#	#TODO
+	#	return
+	
+	#def test_getPreSubscription(self):
+	#	#TODO
+	#	return
+	
+	#def test_putCallbackURL(self):
+	#	#TODO
+	#	return
+	
+	#def test_getCallbackURL(self):
+	#	#TODO
+	#	return
+	
+	#def test_deleteCallbackURL(self):
+	#	#TODO
+	#	return
