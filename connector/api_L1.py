@@ -313,7 +313,7 @@ class connector:
 		if data.status_code == 200: #immediate success
 			result.error = False
 			result.is_done = True
-			result.result = data.content
+			result.result = data.json()
 		else:
 			result.error = response_codes("presubscription",data.status_code)
 			result.is_done = True
@@ -327,7 +327,7 @@ class connector:
 		if data.status_code == 200: #immediate success
 			result.error = False
 			result.is_done = True
-			result.result = json.loads(data.content)
+			result.result = data.json()
 		else:
 			result.error = response_codes("presubscription",data.status_code)
 			result.is_done = True
@@ -343,13 +343,12 @@ class connector:
 		data = self._putURL(url="/notification/callback",payload=payloadToSend, versioned=False)
 		if data.status_code == 204: #immediate success
 			result.error = False
-			result.is_done = True
 			result.result = data.content
 		else:
 			result.error = response_codes("put_callback_url",data.status_code)
-			result.is_done = True
 		result.raw_data = data.content
 		result.status_code = data.status_code
+		result.is_done = True
 		return result
 
 	def getCallback(self):
@@ -357,27 +356,25 @@ class connector:
 		data = self._getURL("/notification/callback",versioned=False)
 		if data.status_code == 200: #immediate success
 			result.error = False
-			result.is_done = True
-			result.result = data.content
+			result.result = data.json()
 		else:
 			result.error = response_codes("get_callback_url",data.status_code)
-			result.is_done = True
 		result.raw_data = data.content
 		result.status_code = data.status_code
+		result.is_done = True
 		return result
 
 	def deleteCallback(self):
 		result = asyncResult()
 		data = self._deleteURL("/notification/callback")
 		if data.status_code == 204: #immediate success
-			result.error = False
-			result.is_done = True
 			result.result = data.content
+			result.error = False
 		else:
 			result.error = response_codes("delete_callback_url",data.status_code)
-			result.is_done = True
 		result.raw_data = data.content
 		result.status_code = data.status_code
+		result.is_done = True
 		return result
 
 	# set a specific handler to call the cbfn
@@ -540,11 +537,13 @@ class connector:
 	# put data to URL with json payload in dataIn
 	def _putURL(self, url,payload="",versioned=True):
 		if self._isJSON(payload):
+			self.log.debug("PUT payload is json")
 			if versioned:
 				return r.put(self.address+self.apiVersion+url,json=payload,headers={"Authorization":"Bearer "+self.bearer})
 			else:
 				return r.put(self.address+url,json=payload,headers={"Authorization":"Bearer "+self.bearer})
 		else:
+			self.log.debug("PUT payload is NOT json")
 			if versioned:
 				return r.put(self.address+self.apiVersion+url,data=payload,headers={"Authorization":"Bearer "+self.bearer})
 			else:
