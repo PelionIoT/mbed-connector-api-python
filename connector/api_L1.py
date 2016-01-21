@@ -116,13 +116,16 @@ class connector:
 			q['noResp'] = 'true' if noResp == True else 'false'
 			q['cacheOnly'] = 'true' if cacheOnly == True else 'false'
 		# make query
+		self.log.debug("ep = %s, query=%s",ep,q)
 		data = self._getURL("/endpoints/"+ep, query=q)
 		result.fill(data)
 		# check sucess of call
 		if data.status_code == 200: # sucess
 			result.error = False
+			self.log.debug("getResources sucess, status_code = `%s`, content = `%s`", str(data.status_code),data.content)
 		else: # fail
 			result.error = response_codes("get_resources",data.status_code)
+			self.log.debug("getResources failed with error code `%s`" %str(data.status_code))
 		result.is_done = True
 		return result
 
