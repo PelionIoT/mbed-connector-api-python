@@ -130,10 +130,7 @@ class test_connector_mock:
 		self.md = mockData()
 		self.ah = asynchMocker()
 		# setup async callback stuffins
-		httpretty.register_uri(httpretty.GET,".*/notification/pull",
-								body=self.ah.input('longPoll'),
-								status=200)
-		self.longPollThread = self.connector.startLongPolling()
+		
 
 	# this function is called after every test function in this class
 	# stop longpolling
@@ -210,6 +207,9 @@ class test_connector_mock:
 	# TODO: this test is not working. currently broken
 	@timed(10)
 	def test_getResourceValue(self):
+		httpretty.register_uri(httpretty.GET,"http://mock/notification/pull",
+								body=self.ah.input('longPoll'),
+								status=200)
 		httpretty.register_uri(httpretty.GET,"http://mock/endpoints",
 								body=self.md.getPayload('endpoints'),
 								status=self.md.getStatusCode('endpoints'))
@@ -219,6 +219,8 @@ class test_connector_mock:
 		httpretty.register_uri(httpretty.GET,"http://mock/endpoints/51f540a2-3113-46e2-aef4-96e94a637b31/Test/0/D", # TODO: replace this with regex
 								body=self.ah.input('getResourceValue'),
 								status=202)
+		self.connector.debug(True)
+		self.connector.startLongPolling()
 		ep = self.connector.getEndpoints()
 		self.waitOnAsync(ep)
 		expect(ep.error).to.equal(False)
