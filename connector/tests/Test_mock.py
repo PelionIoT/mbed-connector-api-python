@@ -123,9 +123,10 @@ class test_connector_mock:
 	# this function is called before every test function in this class
 	# Initialize the mbed connector object and start longpolling
 	def setUp(self):
+		httpretty.HTTPretty.allow_net_connect = False
 		self.connector = api_L1.connector(token, "http://mock")
 		self.connector.apiVersion=""
-		self.connector.debug(True)
+		#self.connector.debug(True)
 		self.md = mockData()
 		self.ah = asynchMocker()
 		# setup async callback stuffins
@@ -147,7 +148,7 @@ class test_connector_mock:
 
 	# test the getLimits function GET /limits
 	def test_getLimits(self):
-		httpretty.register_uri(httpretty.GET,re.compile(".*/limits"),
+		httpretty.register_uri(httpretty.GET,re.compile("http://mock/limits"),
 								body=self.md.getPayload('limits'),
 								status=self.md.getStatusCode('limits'))
 		x = self.connector.getLimits()
@@ -158,7 +159,7 @@ class test_connector_mock:
 
 	# test the getConnectorVersion function, GET /
 	def test_getConnectorVersion(self):
-		httpretty.register_uri(httpretty.GET,re.compile(".*/"),
+		httpretty.register_uri(httpretty.GET,re.compile("http://mock/"),
 								body=self.md.getPayload('connectorVersion'),
 								status=self.md.getStatusCode('connectorVersion'))
 		x = self.connector.getConnectorVersion()
@@ -169,7 +170,7 @@ class test_connector_mock:
 
 	# test the getAPIVersion funciton, GET /rest-version
 	def test_getApiVersion(self):
-		httpretty.register_uri(httpretty.GET,re.compile(".*/rest-versions"),
+		httpretty.register_uri(httpretty.GET,re.compile("http://mock/rest-versions"),
 								body=self.md.getPayload('apiVersion'),
 								status=self.md.getStatusCode('apiVersion'))
 		x = self.connector.getApiVersion()
@@ -180,7 +181,7 @@ class test_connector_mock:
 
 	# test the getEndpoints function, GET /endpoints
 	def test_getEndpoints(self):
-		httpretty.register_uri(httpretty.GET,re.compile(".*/endpoints"),
+		httpretty.register_uri(httpretty.GET,re.compile("http://mock/endpoints"),
 								body=self.md.getPayload('endpoints'),
 								status=self.md.getStatusCode('endpoints'))
 		x = self.connector.getEndpoints()
@@ -191,10 +192,10 @@ class test_connector_mock:
 
 	# test the getResources function, GET /endpoints/{endpoint}
 	def test_getResources(self):
-		httpretty.register_uri(httpretty.GET,re.compile(".*/endpoints"),
+		httpretty.register_uri(httpretty.GET,re.compile("http://mock/endpoints"),
 								body=self.md.getPayload('endpoints'),
 								status=self.md.getStatusCode('endpoints'))
-		httpretty.register_uri(httpretty.GET,re.compile(".*/endpoints/[a-zA-Z0-9\-]*"),
+		httpretty.register_uri(httpretty.GET,re.compile("http://mock/endpoints/(\w\-)+"),
 								body=self.md.getPayload('resources'),
 								status=self.md.getStatusCode('resources'))
 		ep = self.connector.getEndpoints()
@@ -206,15 +207,16 @@ class test_connector_mock:
 		expect(x.isDone()).to.equal(True)
 		expect(x.status_code).to.equal(200)
 
+	# TODO: this test is not working. currently broken
 	@timed(10)
 	def test_getResourceValue(self):
-		httpretty.register_uri(httpretty.GET,re.compile(".*/endpoints"),
+		httpretty.register_uri(httpretty.GET,"http://mock/endpoints",
 								body=self.md.getPayload('endpoints'),
 								status=self.md.getStatusCode('endpoints'))
-		httpretty.register_uri(httpretty.GET,re.compile(".*/endpoints/[a-zA-Z0-9\-]*"),
+		httpretty.register_uri(httpretty.GET,"http://mock/endpoints/51f540a2-3113-46e2-aef4-96e94a637b31", # TODO: replace this with regex
 								body=self.md.getPayload('resources'),
 								status=self.md.getStatusCode('resources'))
-		httpretty.register_uri(httpretty.GET,re.compile(".*/endpoints/[a-zA-Z0-9\-]*/.*"),
+		httpretty.register_uri(httpretty.GET,"http://mock/endpoints/51f540a2-3113-46e2-aef4-96e94a637b31/Test/0/D", # TODO: replace this with regex
 								body=self.ah.input('getResourceValue'),
 								status=202)
 		ep = self.connector.getEndpoints()
@@ -228,7 +230,7 @@ class test_connector_mock:
 		expect(res.isDone()).to.equal(True)
 		print "res.result = "
 		print res.result
-		x = self.connector.getResourceValue(ep.result[0]['name'], res.result[0]['uri'])
+		x = self.connector.getResourceValue("51f540a2-3113-46e2-aef4-96e94a637b31", "/Test/0/D")
 		self.waitOnAsync(x)
 		expect(x.error).to.equal(False)
 		expect(x.isDone()).to.equal(True)
