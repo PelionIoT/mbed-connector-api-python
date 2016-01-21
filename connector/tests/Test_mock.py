@@ -8,10 +8,115 @@ import requests
 import httpretty
 from sure import expect
 from nose.tools import *
-from mock_data import mockData 
+from mock_data import mockData
 import re
+import json
+from base64 import standard_b64encode as b64encode
+import random
+
 # ToDo : change this to make the token pass in through other options
 token = "CHXKYI7AN334D5WQI9DU9PMMDR8G6VPX3763LOT6"
+
+class asynchMocker:
+	"""The asynchMocker class is used to mock asynchronous responses for longpolling """
+
+	_longPollResponseBoilerPlate = {
+		"notifications":[
+						{
+							"ep":"{endpoint-name}",
+							"path":"{uri-path}",
+							"ct":"{content-type}",
+							"payload":"{base64-encoded-payload}",
+							"timestamp":"{timestamp}",
+							"max-age":"{max-age}"
+						}
+						],
+		"registrations":[
+						{
+							"ep": "{endpoint-name}",
+							"ept": "{endpoint-type}",
+							"q": "{queue-mode, default: false}",
+							"resources": [ {
+								"path": "{uri-path}",
+								"if": "{interface-description}",
+								"rf": "{resource-type}",
+								"ct": "{content-type}",
+								"obs": "{is-observable (true|false) }"
+							} ]
+						}
+						],
+		"reg-updates":[
+						{
+							"ep": "{endpoint-name}",
+							"ept": "{endpoint-type}",
+							"q": "{queue-mode, default: false}",
+							"resources": [ {
+								"path": "{uri-path}",
+								"if": "{interface-description}",
+								"rf": "{resource-type}",
+								"ct": "{content-type}",
+								"obs": "{is-observable (true|false) }"
+							} ]
+						}
+						],
+		"de-registrations":[{
+							"{endpoint-name}",
+							"{endpoint-name2}"
+							}],
+		"registrations-expired":[{
+								"{endpoint-name}",
+								"{endpoint-name2}"
+								}],
+		"async-responses":[{
+							"id": "{async-response-id}",
+							"status":  "{http-status-code}", #int
+							"error":  "{error-message}",		#optional
+							"ct":  "{content-type}",
+							"max-age": "{max-age}",			#int
+							"payload":  "{base64-encoded-payload}"
+						}]
+	}
+
+	# extend dictionary class so we can instantiate multiple levels at once
+	class vividict(dict):
+		def __missing__(self, key):
+			value = self[key] = type(self)()
+			return value
+
+	def generateAsyncID(self):
+		return random.randrange(1,9999)
+
+	# used by test infrastructure to directly populate the pending responses
+	def add(self, key, value):
+		if key == 'async':
+			if 'async-responses' not in self._db.keys():
+				self._db['async-responses']=[]
+			self._db['async-responses'].append(value)
+		else:
+			print "failed with key : " +key
+			assert False # support for this key is not implimented yet
+
+	# entry point for all mocking async api calls
+	def input(self,fromWhere):
+		if fromWhere == "longPoll" :
+			ret = json.dumps(self._db)
+			self._db = {}
+			return ret
+		else:
+			asyncID = self.generateAsyncID()
+			self.add('async',{
+								"id": str(asyncID),
+								"status":  200,
+								"max-age": 60,
+								"payload":  b64encode(str(random.randrange(0,99)))
+							})
+			return json.dumps({"async-response-id":str(asyncID)})
+
+	def __init__(self):
+		self._db = self.vividict() # database to hold async items to be processed
+		self._db={}
+		return
+
 
 @httpretty.activate
 class test_connector_mock:
@@ -20,13 +125,19 @@ class test_connector_mock:
 	def setUp(self):
 		self.connector = api_L1.connector(token, "http://mock")
 		self.connector.apiVersion=""
+		self.connector.debug(True)
 		self.md = mockData()
-		#self.longPollThread = self.connector.startLongPolling()
+		self.ah = asynchMocker()
+		# setup async callback stuffins
+		httpretty.register_uri(httpretty.GET,".*/notification/pull",
+								body=self.ah.input('longPoll'),
+								status=200)
+		self.longPollThread = self.connector.startLongPolling()
 
 	# this function is called after every test function in this class
 	# stop longpolling
 	#def tearDown(self):
-		#self.connector.stopLongPolling()
+		self.connector.stopLongPolling()
 
 	# This function takes an async object and waits untill it is completed
 	def waitOnAsync(self,asyncObject):
@@ -36,7 +147,7 @@ class test_connector_mock:
 
 	# test the getLimits function GET /limits
 	def test_getLimits(self):
-		httpretty.register_uri(httpretty.GET,"mock://mock/limits",
+		httpretty.register_uri(httpretty.GET,re.compile(".*/limits"),
 								body=self.md.getPayload('limits'),
 								status=self.md.getStatusCode('limits'))
 		x = self.connector.getLimits()
@@ -47,7 +158,7 @@ class test_connector_mock:
 
 	# test the getConnectorVersion function, GET /
 	def test_getConnectorVersion(self):
-		httpretty.register_uri(httpretty.GET,"mock://mock/",
+		httpretty.register_uri(httpretty.GET,re.compile(".*/"),
 								body=self.md.getPayload('connectorVersion'),
 								status=self.md.getStatusCode('connectorVersion'))
 		x = self.connector.getConnectorVersion()
@@ -58,7 +169,7 @@ class test_connector_mock:
 
 	# test the getAPIVersion funciton, GET /rest-version
 	def test_getApiVersion(self):
-		httpretty.register_uri(httpretty.GET,"mock://mock/rest-versions",
+		httpretty.register_uri(httpretty.GET,re.compile(".*/rest-versions"),
 								body=self.md.getPayload('apiVersion'),
 								status=self.md.getStatusCode('apiVersion'))
 		x = self.connector.getApiVersion()
@@ -69,7 +180,7 @@ class test_connector_mock:
 
 	# test the getEndpoints function, GET /endpoints
 	def test_getEndpoints(self):
-		httpretty.register_uri(httpretty.GET,"mock://mock/endpoints",
+		httpretty.register_uri(httpretty.GET,re.compile(".*/endpoints"),
 								body=self.md.getPayload('endpoints'),
 								status=self.md.getStatusCode('endpoints'))
 		x = self.connector.getEndpoints()
@@ -80,7 +191,7 @@ class test_connector_mock:
 
 	# test the getResources function, GET /endpoints/{endpoint}
 	def test_getResources(self):
-		httpretty.register_uri(httpretty.GET,"mock://mock/endpoints",
+		httpretty.register_uri(httpretty.GET,re.compile(".*/endpoints"),
 								body=self.md.getPayload('endpoints'),
 								status=self.md.getStatusCode('endpoints'))
 		httpretty.register_uri(httpretty.GET,re.compile(".*/endpoints/[a-zA-Z0-9\-]*"),
@@ -89,13 +200,39 @@ class test_connector_mock:
 		ep = self.connector.getEndpoints()
 		self.waitOnAsync(ep)
 		expect(ep.error).to.equal(False)
-		print ep.result
 		x = self.connector.getResources(ep.result[0]['name'])
 		self.waitOnAsync(x)
 		expect(x.error).to.equal(False)
 		expect(x.isDone()).to.equal(True)
 		expect(x.status_code).to.equal(200)
 
+	@timed(10)
+	def test_getResourceValue(self):
+		httpretty.register_uri(httpretty.GET,re.compile(".*/endpoints"),
+								body=self.md.getPayload('endpoints'),
+								status=self.md.getStatusCode('endpoints'))
+		httpretty.register_uri(httpretty.GET,re.compile(".*/endpoints/[a-zA-Z0-9\-]*"),
+								body=self.md.getPayload('resources'),
+								status=self.md.getStatusCode('resources'))
+		httpretty.register_uri(httpretty.GET,re.compile(".*/endpoints/[a-zA-Z0-9\-]*/.*"),
+								body=self.ah.input('getResourceValue'),
+								status=202)
+		ep = self.connector.getEndpoints()
+		self.waitOnAsync(ep)
+		expect(ep.error).to.equal(False)
+		print "ep.result = "
+		print ep.result
+		res = self.connector.getResources(ep.result[0]['name'])
+		self.waitOnAsync(res)
+		expect(res.error).to.equal(False)
+		expect(res.isDone()).to.equal(True)
+		print "res.result = "
+		print res.result
+		x = self.connector.getResourceValue(ep.result[0]['name'], res.result[0]['uri'])
+		self.waitOnAsync(x)
+		expect(x.error).to.equal(False)
+		expect(x.isDone()).to.equal(True)
+		return
 
 	# TODO: remainder of mocking implementations and impliment the asynch callback mechanism
 
