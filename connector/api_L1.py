@@ -403,25 +403,26 @@ class connector:
 			self.log.warn("LongPolling is already active.")
 		else:
 			# start infinite longpolling thread
+			self._stopLongPolling.clear()
 			self.longPollThread.start()
-			self._stopLongPolling = False
 			self.log.info("Spun off LongPolling thread")
 		return self.longPollThread # return thread instance so user can manually intervene if necessary
 
 	# stop longpolling by switching the flag off.
 	def stopLongPolling(self):
 		if(self.longPollThread.isAlive()):
-			self._stopLongPolling = True
+			self._stopLongPolling.set()
 		else:
 			self.log.warn("LongPolling thread already stopped")
 		return
 
 	# Thread to constantly long poll connector and process the feedback.
 	# TODO: pass wait / noWait on to long polling thread, currently the user can set it but it doesnt actually affect anything.
-	def longPoll(self,wait = ""):
-		while self._stopLongPolling == False:
+	def longPoll(self):
+		self.log.debug("LongPolling Started, self.address = %s" %self.address)
+		while(not self._stopLongPolling.is_set()):
 			try:
-				data = r.get(self.address+'/notification/pull'+wait,headers={"Authorization":"Bearer "+self.bearer})
+				data = r.get(self.address+'/notification/pull',headers={"Authorization":"Bearer "+self.bearer})
 				# process callbacks
 				if data.status_code != 204: # 204 means no content, do nothing
 					if 'async-responses' in json.loads(data.content).keys():
@@ -436,9 +437,9 @@ class connector:
 						self.de_registrations_callback(data)
 					if 'registrations-expired' in json.loads(data.content).keys():
 						self.registrations_expired_callback(data)
-					#self.log.debug("data = "+data.content)
+					self.log.debug("Longpoll data = "+data.content)
 			except:
-				self.log.error("\r\n longPolling failed to parse returned goodness")
+				self.log.error("longPolling had an issue and threw an exception")
 				ex_type, ex, tb = sys.exc_info()
 				traceback.print_tb(tb)
 				self.log.error(sys.exc_info())
@@ -500,23 +501,23 @@ class connector:
 	# a L2 implimentation
 	def _defaultHandler(self,data):
 		if 'async-responses' in json.loads(data.content).keys():
-			self.log.debug("\r\n[Default Handler] async-responses detected : ")
+			self.log.debug("[Default Handler] async-responses detected : ")
 			self.log.debug(json.loads(data.content)["async-responses"])
 		if 'notifications' in json.loads(data.content).keys():
-			self.log.debug("\r\n[Default Handler] notifications' detected : ")
+			self.log.debug("[Default Handler] notifications' detected : ")
 			self.log.debug(json.loads(data.content)["notifications"])
 		if 'registrations' in json.loads(data.content).keys():
-			self.log.debug("\r\n[Default Handler] registrations' detected : ")
+			self.log.debug("[Default Handler] registrations' detected : ")
 			self.log.debug(json.loads(data.content)["registrations"])
 		#if 'reg-updates' in json.loads(data.content).keys():
 			# removed because this happens every 10s or so, spamming the output
-			#self.log.debug("\r\n[Default Handler] reg-updates detected : ")
+			#self.log.debug("[Default Handler] reg-updates detected : ")
 			#self.log.debug(json.loads(data.content)["reg-updates"])
 		if 'de-registrations' in json.loads(data.content).keys():
-			self.log.debug("\r\n[Default Handler] de-registrations detected : ")
+			self.log.debug("[Default Handler] de-registrations detected : ")
 			self.log.debug(json.loads(data.content)["de-registrations"])
 		if 'registrations-expired' in json.loads(data.content).keys():
-			self.log.debug("\r\n[Default Handler] registrations-expired detected : ")
+			self.log.debug("[Default Handler] registrations-expired detected : ")
 			self.log.debug(json.loads(data.content)["registrations-expired"])
 
 	# make the requests.
@@ -597,6 +598,9 @@ class connector:
 		self.database['de-registrations']
 		self.database['registrations-expired']
 		self.database['async-responses']
+		# longpolling variable
+		self._stopLongPolling = threading.Event() # must initialize false to avoid race condition
+		self._stopLongPolling.clear()
 		#create thread for long polling
 		self.longPollThread = threading.Thread(target=self.longPoll,name="mbed-connector-longpoll")
 		self.longPollThread.daemon = True # Do this so the thread exits when the overall process does
@@ -610,9 +614,7 @@ class connector:
 		self.reg_updates_callback = self._defaultHandler
 		self.registrations_callback = self._defaultHandler
 		self.notifications_callback = self._defaultHandler
-		# longpolling variable
-		self._stopLongPolling = False # must initialize false to avoid race condition
-		# add logger 
+		# add logger
 		self.log = logging.getLogger(name="mbed-connector-logger")
 		self.log.setLevel(logging.ERROR)
 		self._ch = logging.StreamHandler()
