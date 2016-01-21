@@ -337,7 +337,10 @@ class connector:
 
 	def putCallback(self,url,headers=""):
 		result = asyncResult()
-		data = self._putURL("/notification/callback",url)
+		payloadToSend = {"url":url}
+		if headers:
+			payload['headers':headers]
+		data = self._putURL(url="/notification/callback",payload=payloadToSend, versioned=False)
 		if data.status_code == 204: #immediate success
 			result.error = False
 			result.is_done = True
@@ -351,13 +354,27 @@ class connector:
 
 	def getCallback(self):
 		result = asyncResult()
-		data = self._getURL("/notification/callback")
+		data = self._getURL("/notification/callback",versioned=False)
 		if data.status_code == 200: #immediate success
 			result.error = False
 			result.is_done = True
 			result.result = data.content
 		else:
 			result.error = response_codes("get_callback_url",data.status_code)
+			result.is_done = True
+		result.raw_data = data.content
+		result.status_code = data.status_code
+		return result
+
+	def deleteCallback(self):
+		result = asyncResult()
+		data = self._deleteURL("/notification/callback")
+		if data.status_code == 204: #immediate success
+			result.error = False
+			result.is_done = True
+			result.result = data.content
+		else:
+			result.error = response_codes("delete_callback_url",data.status_code)
 			result.is_done = True
 		result.raw_data = data.content
 		result.status_code = data.status_code
@@ -377,21 +394,6 @@ class connector:
 			self.registrations_callback = cbfn
 		if handler == "notifications":
 			self.notifications_callback = cbfn
-
-
-	def deleteCallback(self):
-		result = asyncResult()
-		data = self._deleteURL("/notification/callback")
-		if data.status_code == 204: #immediate success
-			result.error = False
-			result.is_done = True
-			result.result = data.content
-		else:
-			result.error = response_codes("delete_callback_url",data.status_code)
-			result.is_done = True
-		result.raw_data = data.content
-		result.status_code = data.status_code
-		return result
 
 	# this function needs to spin off a thread that is constantally polling,
 	# should match asynch ID's to values and call their function
