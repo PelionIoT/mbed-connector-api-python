@@ -12,8 +12,30 @@ These examples demonstrate how to use the mbed-connector python library in two i
 #### web app
 For a web app we do not need long polling, instead we can simply register a webhook url and then handle all callbacks to that URL appropriately. This method is reccomended for releases as it is less resource intensive than constantly long polling. 
 ```python
-TODO: put in Flask webapp example
+import api_L1
+from flask import Flask, request
+app = Flask(__name__)
+
+token = "CHXKYI7AN334D5WQI9DU9PMMDR8G6VPX3763LOT6"
+connector = api_L1.connector(token)
+
+@app.route("/webhook", methods=['PUT', 'GET'])
+def webhook():
+    if request.method == 'PUT':
+        data = request.data
+        print 'webhook triggered with data: `%s`'%data
+        return 'OK'
+
+def notificationHandler(notification):
+    print "Notification Received : "+str(notification)
+
+if __name__ == '__main__':
+    connector.putCallback("http://mywebapp.com:8080/webhook")
+    connector.setHandler('notifications', notificationHandler)
+    app.run()
 ```
+In the code above you can see the webhook URL accepts PUT requests. In the initialization of the flask webapp we register the callback to connector with `putCallback("mywebapp.com:8080/webhook)`. You will need to change `mywebapp.com` to match the public url of your web app, also change the `8080` to the port your web app is running on.
+
 
 #### locally hosted
 Using the library locally on your computer will require the use of LongPolling. To initialize the library you will need to import it and then instantiate an instance with the API key taken from [connector.mbed.com](https://connector.mbed.com/#accesskeys). Next you will need to `startLongPolling()` which will spin off a thread that will constantly ping the mbed connector service, when it finds updates that match requests you have made it will trigger the callback function you registered. 
