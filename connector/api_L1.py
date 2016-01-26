@@ -523,23 +523,23 @@ class connector:
 	def _defaultHandler(self,data):
 		if 'async-responses' in data.keys():
 			self.log.debug("[Default Handler] async-responses detected : ")
-			self.log.debug(json.loads(data.content)["async-responses"])
+			self.log.debug(data["async-responses"])
 		if 'notifications' in data.keys():
 			self.log.debug("[Default Handler] notifications' detected : ")
-			self.log.debug(json.loads(data.content)["notifications"])
+			self.log.debug(data["notifications"])
 		if 'registrations' in data.keys():
 			self.log.debug("[Default Handler] registrations' detected : ")
-			self.log.debug(json.loads(data.content)["registrations"])
+			self.log.debug(data["registrations"])
 		#if 'reg-updates' in data.keys():
 			# removed because this happens every 10s or so, spamming the output
 			#self.log.debug("[Default Handler] reg-updates detected : ")
-			#self.log.debug(json.loads(data.content)["reg-updates"])
+			#self.log.debug(data["reg-updates"])
 		if 'de-registrations' in data.keys():
 			self.log.debug("[Default Handler] de-registrations detected : ")
-			self.log.debug(json.loads(data.content)["de-registrations"])
+			self.log.debug(data["de-registrations"])
 		if 'registrations-expired' in data.keys():
 			self.log.debug("[Default Handler] registrations-expired detected : ")
-			self.log.debug(json.loads(data.content)["registrations-expired"])
+			self.log.debug(data["registrations-expired"])
 
 	# make the requests.
 	# url is the API url to hit
