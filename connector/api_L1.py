@@ -427,18 +427,7 @@ class connector:
 				data = r.get(self.address+'/notification/pull',headers={"Authorization":"Bearer "+self.bearer})
 				# process callbacks
 				if data.status_code != 204: # 204 means no content, do nothing
-					if 'async-responses' in json.loads(data.content).keys():
-						self.async_responses_callback(data)
-					if 'notifications' in json.loads(data.content).keys():
-						self.notifications_callback(data)
-					if 'registrations' in json.loads(data.content).keys():
-						self.registrations_callback(data)
-					if 'reg-updates' in json.loads(data.content).keys():
-						self.reg_updates_callback(data)
-					if 'de-registrations' in json.loads(data.content).keys():
-						self.de_registrations_callback(data)
-					if 'registrations-expired' in json.loads(data.content).keys():
-						self.registrations_expired_callback(data)
+					self.handler(data.content)
 					self.log.debug("Longpoll data = "+data.content)
 			except:
 				self.log.error("longPolling had an issue and threw an exception")
@@ -447,6 +436,37 @@ class connector:
 				self.log.error(sys.exc_info())
 				del tb
 		self.log.info("Killing Longpolling Thread")
+
+	# parse the notification channel responses and call appropriate handlers
+	def handler(self,data):
+		if isinstance(data,r.models.Response):
+			self.log.debug("data is request object =  %s" %str(data.content))
+			data = data.content
+		elif isinstance(data,str):
+			self.log.debug("data is json string = %s" %str(data))
+		else:
+			self.log.error("Input is not valid request object or json string : %s" %str(data))
+			return False
+		try:
+			data = json.loads(data)
+			if 'async-responses' in data.keys():
+				self.async_responses_callback(data)
+			if 'notifications' in data.keys():
+				self.notifications_callback(data)
+			if 'registrations' in data.keys():
+				self.registrations_callback(data)
+			if 'reg-updates' in data.keys():
+				self.reg_updates_callback(data)
+			if 'de-registrations' in data.keys():
+				self.de_registrations_callback(data)
+			if 'registrations-expired' in data.keys():
+				self.registrations_expired_callback(data)
+		except:
+			self.log.error("handle router had an issue and threw an exception")
+			ex_type, ex, tb = sys.exc_info()
+			traceback.print_tb(tb)
+			self.log.error(sys.exc_info())
+			del tb
 
 	# Turn on / off debug messages based on the onOff variable
 	def debug(self,onOff):
@@ -458,11 +478,10 @@ class connector:
 			self._ch.setLevel(logging.ERROR)
 
 	# internal async-requests handler.
+	# data input is json data
 	def _asyncHandler(self,data):
-		self.log.debug("data =  %s" %str(data.content))
 		try:
-			payload = json.loads(data.content)
-			responses = payload['async-responses']
+			responses = data['async-responses']
 			for entry in responses:
 				if entry['id'] in self.database['async-responses'].keys():
 					result = self.database['async-responses'].pop(entry['id']) # get the asynch object out of database
@@ -477,7 +496,7 @@ class connector:
 						# everything is good, fill it out
 						result.result = b64decode(entry['payload'])
 						result.raw_data = payload
-						result.status = data.status_code
+						result.status = status_code
 						result.error = False
 						for thing in entry.keys():
 							result.extra[thing]=entry[thing]
@@ -498,27 +517,27 @@ class connector:
 			del tb
 			return
 
-
 	# default handler for notifications. User should impliment all of these in
-	# a L2 implimentation
+	# a L2 implimentation or in their webapp.
+	# @input data is a dictionary
 	def _defaultHandler(self,data):
-		if 'async-responses' in json.loads(data.content).keys():
+		if 'async-responses' in data.keys():
 			self.log.debug("[Default Handler] async-responses detected : ")
 			self.log.debug(json.loads(data.content)["async-responses"])
-		if 'notifications' in json.loads(data.content).keys():
+		if 'notifications' in data.keys():
 			self.log.debug("[Default Handler] notifications' detected : ")
 			self.log.debug(json.loads(data.content)["notifications"])
-		if 'registrations' in json.loads(data.content).keys():
+		if 'registrations' in data.keys():
 			self.log.debug("[Default Handler] registrations' detected : ")
 			self.log.debug(json.loads(data.content)["registrations"])
-		#if 'reg-updates' in json.loads(data.content).keys():
+		#if 'reg-updates' in data.keys():
 			# removed because this happens every 10s or so, spamming the output
 			#self.log.debug("[Default Handler] reg-updates detected : ")
 			#self.log.debug(json.loads(data.content)["reg-updates"])
-		if 'de-registrations' in json.loads(data.content).keys():
+		if 'de-registrations' in data.keys():
 			self.log.debug("[Default Handler] de-registrations detected : ")
 			self.log.debug(json.loads(data.content)["de-registrations"])
-		if 'registrations-expired' in json.loads(data.content).keys():
+		if 'registrations-expired' in data.keys():
 			self.log.debug("[Default Handler] registrations-expired detected : ")
 			self.log.debug(json.loads(data.content)["registrations-expired"])
 
