@@ -495,8 +495,8 @@ class connector:
 					else:
 						# everything is good, fill it out
 						result.result = b64decode(entry['payload'])
-						result.raw_data = payload
-						result.status = status_code
+						result.raw_data = entry
+						result.status = entry['status']
 						result.error = False
 						for thing in entry.keys():
 							result.extra[thing]=entry[thing]
