@@ -424,7 +424,7 @@ class connector:
 		self.log.debug("LongPolling Started, self.address = %s" %self.address)
 		while(not self._stopLongPolling.is_set()):
 			try:
-				data = r.get(self.address+'/notification/pull',headers={"Authorization":"Bearer "+self.bearer})
+				data = r.get(self.address+'/notification/pull',headers={"Authorization":"Bearer "+self.bearer, "Connection":"keep-alive"})
 				# process callbacks
 				if data.status_code != 204: # 204 means no content, do nothing
 					self.handler(data.content)
