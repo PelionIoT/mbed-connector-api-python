@@ -162,7 +162,7 @@ class connector:
 		result = asyncResult(callback=cbfn)
 		result.endpoint = ep
 		result.resource = res
-		data = self._putURL("/endpoints/"+ep+res,json=data)
+		data = self._putURL("/endpoints/"+ep+res,payload=data)
 		if data.status_code == 200: #immediate success
 			result.error = False
 			result.is_done = True
@@ -488,10 +488,13 @@ class connector:
 					# fill in async-result object
 					if 'error' in entry.keys():
 						# error happened, handle it
-						result.error = connectorError('async-responses-handler',entry['status'])
+						result.error = response_codes('async-responses-handler',entry['status'])
 						result.error.error = entry['error']
 						result.is_done = True
-						result.callback(result)
+						if result.callback:
+							result.callback(result)
+						else: 
+							return result
 					else:
 						# everything is good, fill it out
 						result.result = b64decode(entry['payload'])
