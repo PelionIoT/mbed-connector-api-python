@@ -12,11 +12,22 @@ from connectorError import response_codes
 import logging
 
 class asyncResult:
-	"""For use as part of connector library calls that make asycnronous calls.
-		For simple GET calls wait untill the is_done flag is set then read the result and check the status_code.
-		For complex calls like Notifications the next_step variable will move the asynch-callback to a notification """
+	"""
+	AsyncResult objects returned by all L1 library calls. 
+	Make sure to check the ``.isDone()`` function and the ``.error`` variable before accessing the ``.result`` variable. 
+
+
+	:var error: False if no error, if error then populated by :class:'connectorError.response_codes` object
+	:var result: initial value: {}
+	:var status_code: status code returned from REST request
+	:var raw_data: raw returned object form the request
+	"""
 
 	def isDone(self):
+		""" 
+		:returns: True / False based on completion of async operation 
+		:rtype: bool
+		"""
 		return self.is_done
 
 	def fill(self,  data):
@@ -51,10 +62,20 @@ class asyncResult:
 		self.resource = ""
 
 class connector:
-	"""Class to create connector objects and manage connections"""
+	"""
+	Interface class to use the connector.mbed.com REST API. 
+	This class will by default handle asyncronous events.
+	All function return :class:'.asyncResult' objects
+	"""
 
 	# Return connector version number and recent rest API version number it supports
 	def getConnectorVersion(self):
+		"""
+		GET the current Connector version.
+
+		:returns:  asyncResult object, populates error and result fields
+		:rtype: :class:'.asyncResult'
+		"""
 		result = asyncResult()
 		data = self._getURL("/",versioned=False)
 		result.fill(data)
@@ -66,7 +87,12 @@ class connector:
 		return result
 
 	# Return API version of connector
-	def getApiVersion(self):
+	def getApiVersions(self):
+		"""
+		Get the REST API versions that connector accepts.
+
+		:returns:  :class:asyncResult object, populates error and result fields
+		"""
 		result = asyncResult()
 		data = self._getURL("/rest-versions",versioned=False)
 		result.fill(data)
@@ -79,6 +105,10 @@ class connector:
 
 	# Returns metadata about connector limits as JSON blob
 	def getLimits(self):
+		"""return limits of account in async result object.
+
+		:returns:  asyncResult object, populates error and result fields
+		"""
 		result = asyncResult()
 		data = self._getURL("/limits")
 		result.fill(data)
@@ -92,6 +122,12 @@ class connector:
 	# return json list of all endpoints.
 	# optional type field can be used to match all endpoints of a certain type.
 	def getEndpoints(self,typeOfEndpoint=""):
+		"""
+		Get list of all endpoints on the domain.
+		
+		:param str typeOfEndpoint: Optional filter endpoints returned by type
+		:return: list of all endpoints
+		"""
 		q = {}
 		result = asyncResult()
 		if typeOfEndpoint:
@@ -108,6 +144,14 @@ class connector:
 
 	# return json list of all resources on an endpoint
 	def getResources(self,ep,noResp=False,cacheOnly=False):
+		"""
+		Get list of resources on an endpoint.
+		
+		:param str ep: Endpoint to get the resources of
+		:param bool noResp: Optional - specify no response necessary from endpoint
+		:param bool cacheOnly: Optional - get results from cache on connector, do not wake up endpoint
+		:return: list of resources 
+		"""
 		# load query params if set to other than defaults
 		q = {}
 		result = asyncResult()
@@ -132,6 +176,16 @@ class connector:
 
 	# return async object
 	def getResourceValue(self,ep,res,cbfn="",noResp=False,cacheOnly=False):
+		"""
+		Get value of a specific resource on a specific endpoint.
+		
+		:param str ep: name of endpoint
+		:param str res: name of resource
+		:param fnptr cbfn: Optional - callback function to be called on completion
+		:param bool noResp: Optional - specify no response necessary from endpoint
+		:param bool cacheOnly: Optional - get results from cache on connector, do not wake up endpoint
+		:return: value of the resource, usually a string
+		"""
 		q = {}
 		result = asyncResult(callback=cbfn) #set callback fn for use in async handler
 		result.endpoint = ep
@@ -159,6 +213,15 @@ class connector:
 
 	# return async object
 	def putResourceValue(self,ep,res,data,cbfn=""):
+		"""
+		Put a value to a resource on an endpoint
+		
+		:param str ep: name of endpoint
+		:param str res: name of resource
+		:param str data: data to send via PUT
+		:param fnptr cbfn: Optional - callback funtion to call when operation is completed
+		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error``
+		"""
 		result = asyncResult(callback=cbfn)
 		result.endpoint = ep
 		result.resource = res
@@ -177,6 +240,15 @@ class connector:
 
 	#return async object
 	def postResource(self,ep,res,data="",cbfn=""):
+		'''
+		POST data to a resource on an endpoint.
+		
+		:param str ep: name of endpoint
+		:param str res: name of resource
+		:param str data: Optional - data to send via POST
+		:param fnptr cbfn: Optional - callback funtion to call when operation is completed
+		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error``
+		'''
 		result = asyncResult(callback=cbfn)
 		result.endpoint = ep
 		result.resource = res
@@ -195,6 +267,13 @@ class connector:
 
 	# return async object
 	def deleteEndpoint(self,ep,cbfn=""):
+		'''
+		Send DELETE message to an endpoint.
+		
+		:param str ep: name of endpoint
+		:param fnptr cbfn: Optional - callback funtion to call when operation is completed
+		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error``
+		'''
 		result = asyncResult(callback=cbfn)
 		result.endpoint = ep
 		data = self._deleteURL("/endpoints/"+ep)
@@ -214,6 +293,14 @@ class connector:
 	# represents the result. it is up to the user to impliment the notification
 	# channel callback in a higher level library.
 	def putResourceSubscription(self,ep,res,cbfn=""):
+		'''
+		Subscribe to changes in a specific resource ``res`` on an endpoint ``ep``
+		
+		:param str ep: name of endpoint
+		:param str res: name of resource
+		:param fnptr cbfn: Optional - callback funtion to call when operation is completed
+		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error`` 
+		'''
 		result = asyncResult(callback=cbfn)
 		result.endpoint = ep
 		result.resource = res
@@ -231,6 +318,12 @@ class connector:
 		return result
 
 	def deleteEnpointSubscriptions(self,ep):
+		'''
+		Delete all subscriptions on specified endpoint ``ep``
+		
+		:param str ep: name of endpoint
+		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error`` 
+		'''
 		result = asyncResult()
 		result.endpoint = ep
 		data = self._deleteURL("/subscriptions/"+ep)
@@ -245,6 +338,13 @@ class connector:
 		return result
 
 	def deleteResourceSubscription(self,ep,res):
+		'''
+		Delete subscription to a resource ``res`` on an endpoint ``ep``
+		
+		:param str ep: name of endpoint
+		:param str res: name of resource
+		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error``
+		'''
 		result = asyncResult()
 		result.endpoint = ep
 		result.resource = res
@@ -260,6 +360,11 @@ class connector:
 		return result
 
 	def deleteAllSubscriptions(self):
+		'''
+		Delete all subscriptions on the domain (all endpoints, all resources)
+		
+		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error``
+		'''
 		result = asyncResult()
 		data = self._deleteURL("/subscriptions/")
 		if data.status_code == 200: #immediate success
@@ -275,6 +380,12 @@ class connector:
 	# return async object
 	# result field is a string
 	def getEndpointSubscriptions(self,ep):
+		'''
+		Get list of all subscriptions on a given endpoint ``ep``
+		
+		:param str ep: name of endpoint
+		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error``
+		'''
 		result = asyncResult()
 		result.endpoint = ep
 		data = self._getURL("/subscriptions/"+ep)
@@ -292,6 +403,13 @@ class connector:
 	# return async object
 	# result field is a string
 	def getResourceSubscription(self,ep,res):
+		'''
+		Get list of all subscriptions for a resource ``res`` on an endpoint ``ep``
+		
+		:param str ep: name of endpoint
+		:param str res: name of resource
+		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error``
+		'''
 		result = asyncResult()
 		result.endpoint = ep
 		result.resource = res
@@ -308,6 +426,13 @@ class connector:
 		return result
 
 	def putPreSubscription(self,JSONdata):
+		'''
+		Set pre-subscription rules for all endpoints / resources on the domain.
+		This can be useful for all current and future endpoints/resources.
+		
+		:param json JSONdata: data to use as pre-subscription data. Wildcards are permitted
+		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error``
+		'''
 		result = asyncResult()
 		data = self._putURL("/subscriptions",JSONdata, versioned=False)
 		if data.status_code == 200: #immediate success
@@ -322,6 +447,11 @@ class connector:
 		return result
 
 	def getPreSubscription(self):
+		'''
+		Get the current pre-subscription data from connector
+		
+		:return: JSON that represents the pre-subscription data in the ``.result`` field
+		'''
 		result = asyncResult()
 		data = self._getURL("/subscriptions")
 		if data.status_code == 200: #immediate success
@@ -336,6 +466,15 @@ class connector:
 		return result
 
 	def putCallback(self,url,headers=""):
+		'''
+		Set the callback URL. To be used in place of LongPolling when deploying a webapp.
+		
+		**note**: make sure you set up a callback URL in your web app
+		
+		:param str url: complete url, including port, where the callback url is located
+		:param str headers: Optional - Headers to have Connector send back with all calls
+		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error``
+		'''
 		result = asyncResult()
 		payloadToSend = {"url":url}
 		if headers:
@@ -352,6 +491,11 @@ class connector:
 		return result
 
 	def getCallback(self):
+		'''
+		Get the callback URL currently registered with Connector. 
+		
+		:return: callback url in ``.result``, error if applicable in ``.error``
+		'''
 		result = asyncResult()
 		data = self._getURL("/notification/callback",versioned=False)
 		if data.status_code == 200: #immediate success
@@ -365,6 +509,11 @@ class connector:
 		return result
 
 	def deleteCallback(self):
+		'''
+		Delete the Callback URL currently registered with Connector.
+		
+		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error``
+		'''
 		result = asyncResult()
 		data = self._deleteURL("/notification/callback")
 		if data.status_code == 204: #immediate success
@@ -395,6 +544,12 @@ class connector:
 	# this function needs to spin off a thread that is constantally polling,
 	# should match asynch ID's to values and call their function
 	def startLongPolling(self, noWait=False):
+		'''
+		Start LongPolling Connector for notifications.
+		
+		:param bool noWait: Optional - use the cached values in connector, do not wait for the device to respond
+		:return: Thread of constantly running LongPoll. To be used to kill the thred if necessary.
+		'''
 		# check Asynch ID's against insternal database of ID's
 		# Call return function with the value given, maybe decode from base64?
 		wait = ''
@@ -412,6 +567,11 @@ class connector:
 
 	# stop longpolling by switching the flag off.
 	def stopLongPolling(self):
+		'''
+		Stop LongPolling thread
+		
+		:return: none
+		'''
 		if(self.longPollThread.isAlive()):
 			self._stopLongPolling.set()
 		else:
@@ -439,6 +599,12 @@ class connector:
 
 	# parse the notification channel responses and call appropriate handlers
 	def handler(self,data):
+		'''
+		Function to handle notification data as part of Callback URL handler.
+		
+		:param str data: data posted to Callback URL by connector. 
+		:return: nothing
+		'''
 		if isinstance(data,r.models.Response):
 			self.log.debug("data is request object =  %s" %str(data.content))
 			data = data.content
@@ -470,6 +636,12 @@ class connector:
 
 	# Turn on / off debug messages based on the onOff variable
 	def debug(self,onOff):
+		'''
+		Enable / Disable debugging 
+		
+		:param bool onOff: turn debugging on / off
+		:return: none
+		'''
 		if onOff:
 			self.log.setLevel(logging.DEBUG)
 			self._ch.setLevel(logging.DEBUG)
@@ -533,10 +705,10 @@ class connector:
 		if 'registrations' in data.keys():
 			self.log.debug("[Default Handler] registrations' detected : ")
 			self.log.debug(data["registrations"])
-		#if 'reg-updates' in data.keys():
+		if 'reg-updates' in data.keys():
 			# removed because this happens every 10s or so, spamming the output
-			#self.log.debug("[Default Handler] reg-updates detected : ")
-			#self.log.debug(data["reg-updates"])
+			self.log.debug("[Default Handler] reg-updates detected : ")
+			self.log.debug(data["reg-updates"])
 		if 'de-registrations' in data.keys():
 			self.log.debug("[Default Handler] de-registrations detected : ")
 			self.log.debug(data["de-registrations"])

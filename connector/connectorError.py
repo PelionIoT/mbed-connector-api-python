@@ -4,7 +4,14 @@
 # See LICENSE file for details.
 
 class response_codes:
-	"""Error class for connector L1 library. Contains the error type, and error string."""
+	"""
+	Error class for connector L1 library. Contains the error type, and error string.
+	
+	:var status_code: status code returned by connector request
+	:var errType: combination of parent calling function and status code
+	:var error: error given by the https://docs.mbed.com/docs/mbed-device-connector-web-interface docs.
+	
+	"""
 	# list of all possible error tuples
 	__errList = {
 			# GET Errors
