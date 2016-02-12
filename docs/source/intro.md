@@ -2,7 +2,7 @@
 Intro
 =====
 
-The mbed-connector-python module is an interface to the `connector.mbed.com REST API <https://docs.mbed.com/docs/mbed-device-connector-web-interfaces>`_.
+The mdc-api-python module is an interface to the `connector.mbed.com REST API <https://docs.mbed.com/docs/mbed-device-connector-web-interfaces>`_.
 The methods in this module are named in compliance with the <TODO: Insert link> naming scheme.
 
 To use this module you will need to do the following

@@ -835,7 +835,7 @@ class connector:
 		self._stopLongPolling = threading.Event() # must initialize false to avoid race condition
 		self._stopLongPolling.clear()
 		#create thread for long polling
-		self.longPollThread = threading.Thread(target=self.longPoll,name="mbed-connector-longpoll")
+		self.longPollThread = threading.Thread(target=self.longPoll,name="mdc-api-longpoll")
 		self.longPollThread.daemon = True # Do this so the thread exits when the overall process does
 		# set default webAddress  and port to mbed connector
 		self.address = webAddress
@@ -848,7 +848,7 @@ class connector:
 		self.registrations_callback = self._defaultHandler
 		self.notifications_callback = self._defaultHandler
 		# add logger
-		self.log = logging.getLogger(name="mbed-connector-logger")
+		self.log = logging.getLogger(name="mdc-api-logger")
 		self.log.setLevel(logging.ERROR)
 		self._ch = logging.StreamHandler()
 		self._ch.setLevel(logging.ERROR)
