@@ -179,6 +179,7 @@ For more information see the connector docs at : https://docs.mbed.com/docs/mbed
 
 .. code-block:: python
 
+    
     def test(message):
         print("Received Notification message : %s", message)
 
