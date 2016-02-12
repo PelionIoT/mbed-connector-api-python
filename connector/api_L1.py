@@ -528,6 +528,20 @@ class connector:
 
 	# set a specific handler to call the cbfn
 	def setHandler(self,handler,cbfn):
+		'''
+		Register a handler for a particular notification type.
+		There are 6 types of notifications
+			'async-responses'
+			'registrations-expired'
+			'de-registrations'
+			'reg-updates'
+			'registrations'
+			'notifications'
+			
+		:param str handler: name of the notification type
+		:param fnptr cbfn: function to pass the notification channel messages to.
+		:return: Nothing.
+		'''
 		if handler == "async-responses":
 			self.async_responses_callback = cbfn
 		if handler == "registrations-expired":
