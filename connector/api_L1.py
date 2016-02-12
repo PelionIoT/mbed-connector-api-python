@@ -13,7 +13,7 @@ import logging
 
 class asyncResult:
 	"""
-	AsyncResult objects returned by all L1 library calls. 
+	AsyncResult objects returned by all api_L1 library calls. 
 	Make sure to check the ``.isDone()`` function and the ``.error`` variable before accessing the ``.result`` variable. 
 
 
@@ -74,7 +74,7 @@ class connector:
 		GET the current Connector version.
 
 		:returns:  asyncResult object, populates error and result fields
-		:rtype: :class:'.asyncResult'
+		:rtype: asyncResult
 		"""
 		result = asyncResult()
 		data = self._getURL("/",versioned=False)
@@ -92,6 +92,7 @@ class connector:
 		Get the REST API versions that connector accepts.
 
 		:returns:  :class:asyncResult object, populates error and result fields
+		:rtype: asyncResult
 		"""
 		result = asyncResult()
 		data = self._getURL("/rest-versions",versioned=False)
@@ -108,6 +109,7 @@ class connector:
 		"""return limits of account in async result object.
 
 		:returns:  asyncResult object, populates error and result fields
+		:rtype: asyncResult
 		"""
 		result = asyncResult()
 		data = self._getURL("/limits")
@@ -127,6 +129,7 @@ class connector:
 		
 		:param str typeOfEndpoint: Optional filter endpoints returned by type
 		:return: list of all endpoints
+		:rtype: asyncResult
 		"""
 		q = {}
 		result = asyncResult()
@@ -151,6 +154,7 @@ class connector:
 		:param bool noResp: Optional - specify no response necessary from endpoint
 		:param bool cacheOnly: Optional - get results from cache on connector, do not wake up endpoint
 		:return: list of resources 
+		:rtype: asyncResult
 		"""
 		# load query params if set to other than defaults
 		q = {}
@@ -185,6 +189,7 @@ class connector:
 		:param bool noResp: Optional - specify no response necessary from endpoint
 		:param bool cacheOnly: Optional - get results from cache on connector, do not wake up endpoint
 		:return: value of the resource, usually a string
+		:rtype: asyncResult
 		"""
 		q = {}
 		result = asyncResult(callback=cbfn) #set callback fn for use in async handler
@@ -221,6 +226,7 @@ class connector:
 		:param str data: data to send via PUT
 		:param fnptr cbfn: Optional - callback funtion to call when operation is completed
 		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error``
+		:rtype: asyncResult
 		"""
 		result = asyncResult(callback=cbfn)
 		result.endpoint = ep
@@ -248,6 +254,7 @@ class connector:
 		:param str data: Optional - data to send via POST
 		:param fnptr cbfn: Optional - callback funtion to call when operation is completed
 		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error``
+		:rtype: asyncResult
 		'''
 		result = asyncResult(callback=cbfn)
 		result.endpoint = ep
@@ -273,6 +280,7 @@ class connector:
 		:param str ep: name of endpoint
 		:param fnptr cbfn: Optional - callback funtion to call when operation is completed
 		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error``
+		:rtype: asyncResult
 		'''
 		result = asyncResult(callback=cbfn)
 		result.endpoint = ep
@@ -300,6 +308,7 @@ class connector:
 		:param str res: name of resource
 		:param fnptr cbfn: Optional - callback funtion to call when operation is completed
 		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error`` 
+		:rtype: asyncResult
 		'''
 		result = asyncResult(callback=cbfn)
 		result.endpoint = ep
@@ -323,6 +332,7 @@ class connector:
 		
 		:param str ep: name of endpoint
 		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error`` 
+		:rtype: asyncResult
 		'''
 		result = asyncResult()
 		result.endpoint = ep
@@ -344,6 +354,7 @@ class connector:
 		:param str ep: name of endpoint
 		:param str res: name of resource
 		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error``
+		:rtype: asyncResult
 		'''
 		result = asyncResult()
 		result.endpoint = ep
@@ -364,6 +375,7 @@ class connector:
 		Delete all subscriptions on the domain (all endpoints, all resources)
 		
 		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error``
+		:rtype: asyncResult
 		'''
 		result = asyncResult()
 		data = self._deleteURL("/subscriptions/")
@@ -385,6 +397,7 @@ class connector:
 		
 		:param str ep: name of endpoint
 		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error``
+		:rtype: asyncResult
 		'''
 		result = asyncResult()
 		result.endpoint = ep
@@ -409,6 +422,7 @@ class connector:
 		:param str ep: name of endpoint
 		:param str res: name of resource
 		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error``
+		:rtype: asyncResult
 		'''
 		result = asyncResult()
 		result.endpoint = ep
@@ -432,6 +446,7 @@ class connector:
 		
 		:param json JSONdata: data to use as pre-subscription data. Wildcards are permitted
 		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error``
+		:rtype: asyncResult
 		'''
 		result = asyncResult()
 		data = self._putURL("/subscriptions",JSONdata, versioned=False)
@@ -451,6 +466,7 @@ class connector:
 		Get the current pre-subscription data from connector
 		
 		:return: JSON that represents the pre-subscription data in the ``.result`` field
+		:rtype: asyncResult
 		'''
 		result = asyncResult()
 		data = self._getURL("/subscriptions")
@@ -474,6 +490,7 @@ class connector:
 		:param str url: complete url, including port, where the callback url is located
 		:param str headers: Optional - Headers to have Connector send back with all calls
 		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error``
+		:rtype: asyncResult
 		'''
 		result = asyncResult()
 		payloadToSend = {"url":url}
@@ -495,6 +512,7 @@ class connector:
 		Get the callback URL currently registered with Connector. 
 		
 		:return: callback url in ``.result``, error if applicable in ``.error``
+		:rtype: asyncResult
 		'''
 		result = asyncResult()
 		data = self._getURL("/notification/callback",versioned=False)
@@ -513,6 +531,7 @@ class connector:
 		Delete the Callback URL currently registered with Connector.
 		
 		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error``
+		:rtype: asyncResult
 		'''
 		result = asyncResult()
 		data = self._deleteURL("/notification/callback")
@@ -563,6 +582,7 @@ class connector:
 		
 		:param bool noWait: Optional - use the cached values in connector, do not wait for the device to respond
 		:return: Thread of constantly running LongPoll. To be used to kill the thred if necessary.
+		:rtype: pythonThread
 		'''
 		# check Asynch ID's against insternal database of ID's
 		# Call return function with the value given, maybe decode from base64?
