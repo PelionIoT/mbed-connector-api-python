@@ -15,7 +15,8 @@ Install the ``mbed-connector`` module from pip::
 
 Use
 ---
-There are 5 steps to using the library. For more detailed examples please see the Examples section. 
+There are 5 steps to using the library. For more detailed examples please see the Examples section.
+You are **REQUIRED** to set up a notification channel (Step 3), either LongPolling or Callback URL before using any other connector services.
 
     1. Import connector module::
 

@@ -48,7 +48,11 @@ When running code on your local machine you will want to use LongPolling instead
 
 Callback URL / Webhook
 -----------------------
-TODO <INSERT HERE>
+Instead of Long Polling you can use a callback URL, also known as a webhook. To do this you will need a public web address for your webapp and a function that can receive PUT requests. You can use the ``.putCallback('url')`` function to register the callback url with connector. It is important that the callback URL be publically acessable, otherwise the registration will fail. The code below assums you are using the web.py library. 
+
+.. code-block:: python
+
+
 
 List all Endpoints
 -------------------
@@ -163,8 +167,8 @@ Sometimes you just want more debug on your terminal. Handy because by default de
     x.debug(True) # Turn on debug
     
 
-Add handler
-------------
+Add Notification Channel handler
+---------------------------------
 Add function to handle types of messages in notification channel.
 The following are the types of notifications allowable
     
