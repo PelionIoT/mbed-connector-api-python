@@ -9,9 +9,9 @@ To use this module you will need to do the following
 
 Install
 -------
-Install the ``mbed-connector`` module from pip::
+Install the ``mdc_api`` module from pip::
 
-    pip install -U mbed-connector
+    pip install -U mdc_api
 
 Use
 ---
@@ -20,11 +20,11 @@ You are **REQUIRED** to set up a notification channel (Step 3), either LongPolli
 
     1. Import connector module::
 
-        from mbed-connector import api_L1
+        import mdc_api
     
     2. Initialize instance with API token from your `Connector Access Keys <https://connector.mbed.com/#accesskeys>`_::
 
-        x = api_L1("API TOKEN")
+        x = mdc_api.connector("API TOKEN")
     
     3. Set notification Channel (Use LongPolling or CallbackURL / Webhook)::
 

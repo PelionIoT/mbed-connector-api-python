@@ -40,7 +40,7 @@ When running code on your local machine you will want to use LongPolling instead
 
 .. code-block:: python
 
-    import connector.api_L1 # import library
+    import mdc_api.connector # import library
     x = api_L1("API-Token") # initialize object
     x.startLongPolling()    # start long polling
     # ... Do stuff
