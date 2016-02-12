@@ -103,4 +103,85 @@ Get the value of a resource on an Endpoint.
     # x is initialized api_L1 object
     r = x.getResourceValue(ep="EndpointName",res="ResourceName",cbfn=test)
     
+Put Value to Resource
+----------------------
+Change the value of a resource on an endpoint by putting to it.
+
+.. code-block:: python
+
+    # x is initialized api_L1 object
+    r = x.putResourceValue('EndpointName','ResourceName','DataToSend')
+    # check error, optional cbfn will be called when operation is completed. 
     
+Post Value to Resource
+-----------------------
+Posting a value to a resource will trigger the associated callback function and pass it the optional data. This method is usually used to trigger events.
+
+.. code-block:: python
+
+    # x is initialized api_L1 object
+    r = x.postResource('EndpointName','ResourceName','Optional Data')
+    # check error, optional cbfn will be called when operation is completed
+    
+
+Subscribe to Resource
+----------------------
+Subscribe to a resource to automatically be notified of changes to resource values. Note that all changes to the resource value will be received in the notification channel (LongPolling or Callback URL / Webhook)
+
+.. code-block:: python 
+
+    # x is initialized api_L1 object
+    r = x.pubResourceSubscription('endpointName','resourceName')
+    # check error, or use optional cbfn to handle failure / success.
+
+
+Delete Subscriptions
+---------------------
+You can delete subscriptions at 3 levels.
+
+    1. delete single resource subscription : ``deleteResourceSubscription('endpoint','resource')``
+    2. delete all subscriptions on an endpoint : ``deleteEnpointSubscriptions('endpoint')``
+    3. delete all resource subscriptions on all endpoints on domain : ``deleteAllSubscriptions()``
+
+
+Pre-subscription
+-----------------
+Use pre-subscriptions to subscribe to resources that match a certain pattern. Pre-Subscriptions can be used to subscribe to all resources / endpoints on a domain. This applies to all existing resources and all future resouces.
+
+.. code-block:: python
+   
+    #TODO < CODE HERE>
+    
+
+Enable Debug
+-------------
+Sometimes you just want more debug on your terminal. Handy because by default debugging will display all the different notification channel messages.
+
+.. code-block:: python
+
+    # x is initialized api_L1 object
+    x.debug(True) # Turn on debug
+    
+
+Add handler
+------------
+Add function to handle types of messages in notification channel.
+The following are the types of notifications allowable
+    
+    1. ``‘async-responses’`` - handled by api_L1, can be overridden
+    2. ``‘registrations-expired’`` - endpoint has dissappeared 
+    3. ``‘de-registrations’`` - endpoint willingly leaves
+    4. ``‘reg-updates’`` - endpoint pings home
+    5. ``‘registrations’`` - new endpoints added to domain
+    6. ``‘notifications’`` - subscribed resource value changed
+    
+For more information see the connector docs at : https://docs.mbed.com/docs/mbed-device-connector-web-interfaces 
+
+.. code-block:: python
+
+    def test(message):
+        print("Received Notification message : %s", message)
+
+    # x is initialized api_L1 object
+    x.sethandler('notifications', test)
+
