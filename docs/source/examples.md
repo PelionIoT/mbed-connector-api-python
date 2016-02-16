@@ -1,16 +1,16 @@
 Examples
 ========
 
-How to use Async Objects
---------------------------
-AsyncResult objects have several useful fields. After each api call you should do the following:
-    1. Check the ``.isDone()`` function. This will return True when the operation has completed.
+How to use async objects
+-------------------------
+asyncResult objects have several useful fields. After each API call you should do the following:
+    1. Check the ``.isDone()`` function. This returns ``True`` when the operation has completed.
     2. Check the ``.error`` variable. If it is set to ``False`` then there is no error. If it is not ``False`` then the ``.error`` variable contains a ``connectorError`` object.
     3. Read the ``.result`` variable to get the result of the API action. 
 
 .. code-block:: python
 
-    # x is initialized connector object
+    # x is an initialized Connector object
     e = x.getEndpoints()
     while not e.isDone():
         None
@@ -19,66 +19,67 @@ AsyncResult objects have several useful fields. After each api call you should d
     else:
         print("Result is %s",e.result)
     
-How to use ConnectorError Objects
+How to use connectorError objects
 ----------------------------------
-Connector Error objects contain several fields. In general you will probably one encounter this object when something has gone wrong. To find what the error was you can check the ``.error`` variable which will contain a string representing the error. The ``.status_code`` variable contains the returned status code related to the error. 
+You will probably only encounter this object when something has gone wrong. To find what the error was you can check the ``.error`` variable, which contains a string representing the error. The ``.status_code`` variable contains the returned status code related to the error. 
 
 .. code-block:: python
 
-    # x is initialized api_L1 object
+    # x is an initialized mdc_api object
     e = x.getEndpoints()
     if e.error:
         print e.error.error         # Error message
-        print e.error.errType       # Error Type
+        print e.error.errType       # Error type
         print e.error.status_code   # Error status code
 
 
 
-Long Polling 
+Long polling 
 -------------
-When running code on your local machine you will want to use LongPolling instead of a callback URL / webhook. You must set up a notification channel before any other operations can be used. 
+When running code on your local machine you will want to use long polling instead of a callback URL (webhook). This is because your local machine does not have a publically addressable IP, so it cannot register a webhook. You should start longpolling before doing any other operations as the long poll will serve as a notification channel between Connector and your app. 
 
 .. code-block:: python
 
-    import mdc_api.connector # import library
-    x = api_L1("API-Token") # initialize object
-    x.startLongPolling()    # start long polling
+    import mdc_api.connector            # Import library
+    x = mdc_api.connector("API-Token")  # Initialize object
+    x.startLongPolling()                # Start long polling
     # ... Do stuff
 
 
-Callback URL / Webhook
+Callback URL (webhook)
 -----------------------
-Instead of Long Polling you can use a callback URL, also known as a webhook. To do this you will need a public web address for your webapp and a function that can receive PUT requests. You can use the ``.putCallback('url')`` function to register the callback url with connector. It is important that the callback URL be publically acessable, otherwise the registration will fail. The code below assums you are using the web.py library. 
+Instead of long polling you can use a callback URL, also known as a webhook. To do this you will need a public web address for your web app and a function that can receive PUT requests. You can use the ``.putCallback('url')`` function to register the callback URL with Connector. It is important that the callback URL be publically accessible, otherwise the registration will fail. The code below assums you are using the ``web.py`` library. 
 
 .. code-block:: python
 
+<TODO>
 
 
-List all Endpoints
+List all endpoints
 -------------------
 Get all endpoints by using the ``getEndpoints()`` function.
 
 .. code-block:: python
 
-    # x is initialized api_L1 object
+    # x is an initialized mdc_api object
     r = x.getEndpoints()
-    while not r.isDone():   # wait for asynch operation to complete
+    while not r.isDone():   # Wait for asynch operation to complete
         None
-    if r.error:     # check if there was an error
+    if r.error:     # Check whether there was an error
         print("Error : %s",r.error.error)
     else:
-        print r.result  # no error, grab the list of endpoints!
+        print r.result  # No error; grab the list of endpoints
 
     Example Output:
     >>> []
 
-List Resources on Endpoint
----------------------------
+List endpoint resources
+------------------------
 Get all resources on an endpoint by using the ``getResources()`` function. 
 
 .. code-block:: python
 
-    # x is initialized api_L1 object
+    # x is an initialized mdc_api object
     r = x.getResources("endpointName")
     while not r.isDone():
         None
@@ -91,95 +92,95 @@ Get all resources on an endpoint by using the ``getResources()`` function.
     >>> []
 
 
-Get value of resource 
-----------------------
-Get the value of a resource on an Endpoint.
+GET resource value
+-------------------
+Get the value of a resource on an endpoint.
 
 .. code-block:: python
 
-    # callback function to handle result, pass asyncResult object
+    # Callback function to handle result and pass asyncResult object
     def test(data):
         if data.error:
             print("Error: %s", data.error.error)
         else:
             print("Resource Value = %s",data.result)
 
-    # x is initialized api_L1 object
+    # x is an initialized mdc_api object
     r = x.getResourceValue(ep="EndpointName",res="ResourceName",cbfn=test)
     
-Put Value to Resource
+PUT value to resource
 ----------------------
-Change the value of a resource on an endpoint by putting to it.
+Change the value of a resource on an endpoint by using ``PUT``.
 
 .. code-block:: python
 
-    # x is initialized api_L1 object
+    # x is an initialized mdc_api object
     r = x.putResourceValue('EndpointName','ResourceName','DataToSend')
-    # check error, optional cbfn will be called when operation is completed. 
+    # Check error. Optional: CBFN will be called when operation is completed. 
     
-Post Value to Resource
+POST value to resource
 -----------------------
-Posting a value to a resource will trigger the associated callback function and pass it the optional data. This method is usually used to trigger events.
+POSTing a value to a resource triggers the associated callback function and passes optional data to it. This method is usually used to trigger events.
 
 .. code-block:: python
 
-    # x is initialized api_L1 object
+    # x is an initialized mdc_api object
     r = x.postResource('EndpointName','ResourceName','Optional Data')
-    # check error, optional cbfn will be called when operation is completed
+     # Check error. Optional: CBFN will be called when operation is completed. 
     
 
-Subscribe to Resource
+Subscribe to resource
 ----------------------
-Subscribe to a resource to automatically be notified of changes to resource values. Note that all changes to the resource value will be received in the notification channel (LongPolling or Callback URL / Webhook)
+Subscribe to a resource to automatically be notified of changes to resource values. Note that all changes to the resource value are received in the notification channel (long polling or callback URL (webhook).
 
 .. code-block:: python 
 
-    # x is initialized api_L1 object
+    # x is an initialized mdc_api object
     r = x.pubResourceSubscription('endpointName','resourceName')
-    # check error, or use optional cbfn to handle failure / success.
+    # Check error, or use optional CBFN to handle failure and success.
 
 
-Delete Subscriptions
+DELETE subscriptions
 ---------------------
-You can delete subscriptions at 3 levels.
+You can delete subscriptions at three levels.
 
-    1. delete single resource subscription : ``deleteResourceSubscription('endpoint','resource')``
-    2. delete all subscriptions on an endpoint : ``deleteEnpointSubscriptions('endpoint')``
-    3. delete all resource subscriptions on all endpoints on domain : ``deleteAllSubscriptions()``
+    1. Delete single resource subscription: ``deleteResourceSubscription('endpoint','resource')``.
+    2. Delete all subscriptions on an endpoint: ``deleteEnpointSubscriptions('endpoint')``.
+    3. Delete all resource subscriptions on all endpoints on domain: ``deleteAllSubscriptions()``.
 
 
 Pre-subscription
 -----------------
-Use pre-subscriptions to subscribe to resources that match a certain pattern. Pre-Subscriptions can be used to subscribe to all resources / endpoints on a domain. This applies to all existing resources and all future resouces.
+You can use pre-subscriptions to subscribe to all domain resources or endpoints that match a certain pattern. This applies to both existing and future resources.
 
 .. code-block:: python
    
     #TODO < CODE HERE>
     
 
-Enable Debug
+Enable debug
 -------------
-Sometimes you just want more debug on your terminal. Handy because by default debugging will display all the different notification channel messages.
+If you want debug messages to be printed to the terminal, you need to enable debug for your mdc_api object. By default, debugging displays all notification channel messages.
 
 .. code-block:: python
 
-    # x is initialized api_L1 object
+    # x is an initialized mdc_api object
     x.debug(True) # Turn on debug
     
 
-Add Notification Channel handler
+Add notification channel handler
 ---------------------------------
-Add function to handle types of messages in notification channel.
-The following are the types of notifications allowable
+Add a function to handle different message types on the notification channel.
+The following notifications types are permitted:
     
-    1. ``‘async-responses’`` - handled by api_L1, can be overridden
-    2. ``‘registrations-expired’`` - endpoint has dissappeared 
-    3. ``‘de-registrations’`` - endpoint willingly leaves
-    4. ``‘reg-updates’`` - endpoint pings home
-    5. ``‘registrations’`` - new endpoints added to domain
-    6. ``‘notifications’`` - subscribed resource value changed
+    1. ``‘async-responses’``: handled by api_L1, can be overridden.
+    2. ``‘registrations-expired’``: endpoint has disappeared.
+    3. ``‘de-registrations’``: endpoint has willingly left.
+    4. ``‘reg-updates’``: endpoint has pinged Connector.
+    5. ``‘registrations’``: new endpoints added to domain.
+    6. ``‘notifications’``: subscribed resource value changed.
     
-For more information see the connector docs at : https://docs.mbed.com/docs/mbed-device-connector-web-interfaces 
+For more information see the [Connector docs](https://docs.mbed.com/docs/mbed-device-connector-web-interfaces).
 
 .. code-block:: python
 
@@ -187,6 +188,6 @@ For more information see the connector docs at : https://docs.mbed.com/docs/mbed
     def test(message):
         print("Received Notification message : %s", message)
 
-    # x is initialized api_L1 object
+    # x is an initialized mdc_api object
     x.sethandler('notifications', test)
 

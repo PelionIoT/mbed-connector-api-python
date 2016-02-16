@@ -2,10 +2,13 @@
 Intro
 =====
 
-The mdc-api-python module is an interface to the `connector.mbed.com REST API <https://docs.mbed.com/docs/mbed-device-connector-web-interfaces>`_.
-The methods in this module are named in compliance with the <TODO: Insert link> naming scheme.
+The mdc-api-python module is an interface between a python application and the `connector.mbed.com REST API <https://docs.mbed.com/docs/mbed-device-connector-web-interfaces>`_. 
 
-To use this module you will need to do the following
+Requirements
+-------------
+    1. Python 2.7.9+ 
+    2. [connector.mbed.com](http://www.connector.mbed.com) account
+
 
 Install
 -------
@@ -15,40 +18,41 @@ Install the ``mdc_api`` module from pip::
 
 Use
 ---
-There are 5 steps to using the library. For more detailed examples please see the Examples section.
-You are **REQUIRED** to set up a notification channel (Step 3), either LongPolling or Callback URL before using any other connector services.
+There are five steps to using the library. For more detailed examples please see the [Examples](./Examples) section.
 
-    1. Import connector module::
+You are **required** to set up a notification channel (step 3), either long polling or callback URL, before using any other mbed Device Connector services.
+
+    1. Import the package::
 
         import mdc_api
     
-    2. Initialize instance with API token from your `Connector Access Keys <https://connector.mbed.com/#accesskeys>`_::
+    2. Initialize an instance with an API token from your `Connector Access Keys <https://connector.mbed.com/#accesskeys>`_::
 
         x = mdc_api.connector("API TOKEN")
     
-    3. Set notification Channel (Use LongPolling or CallbackURL / Webhook)::
+    3. Set a notification channel (use long polling,  or callback URL or a webhook)::
 
-        # Long Polling
+        # Long polling
         x.startLongPolling() 
         
-        # Callback URL / Webhook, must be able to receive PUT messages
+        # Callback URL or webhook must be able to receive PUT messages
         x.putCallback('https://www.mywebapp.com:8080/callback') 
 
-    4. **Optional** - Register Notification Channel handlers for various message types::
+    4. (**Optional**) Register notification channel handlers for various message types::
 
-        # handle 'notifications' messages
+        # Handle 'notifications' messages
         def updatesReceived(data):
             print("Received Update : %s", data.result)
         
-        # register function with notification channel router
+        # Register function with notification channel router
         x.setHandler('notifications',updateReceived)
     
-    5. Use the API functions to access Endpoints / Resources::
+    5. Use the API functions to access endpoints and resources::
 
-        x.getEndpoints()    # get list of all endpoints on domain
-        x.getResources("Endpoint") # get list of all resources on endpoint
-        x.getResourceValue("Endpoint","Resource")   # get value of Resource
-        x.putResourceValue("Endpoint","Resource","Data")    # set value of resource
-        x.postResource("Endpoint","Resource","OptionalData")    # trigger execution funtion of resource
+        x.getEndpoints()    # Get list of all endpoints on domain
+        x.getResources("Endpoint") # Get list of all resources on endpoint
+        x.getResourceValue("Endpoint","Resource")   # Get value of resource
+        x.putResourceValue("Endpoint","Resource","Data")    # Set value of resource
+        x.postResource("Endpoint","Resource","OptionalData")    # Trigger execution function of resource
     
-    **NOTE**: All API functions return asyncResult objects and throw connectorError objects
+    **NOTE**: All API functions return asyncResult objects and throw connectorError objects.
