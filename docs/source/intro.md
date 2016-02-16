@@ -2,7 +2,7 @@
 Intro
 =====
 
-The mdc-api-python module is an interface between a python application and the `connector.mbed.com REST API <https://docs.mbed.com/docs/mbed-device-connector-web-interfaces>`_. 
+The mdc-api-python module is an interface between a python application and the `connector.mbed.com REST API <https://docs.mbed.com/docs/mbed-device-connector-web-interfaces>`_. This module enables you to write python programs that use mbed Device Connector. All features of the mbed Device Connector REST interface are exposed through this package. 
 
 Requirements
 -------------
