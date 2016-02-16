@@ -716,8 +716,9 @@ class connector:
 							result.callback(result)
 						else:
 							self.log.warn("No callback function given")
-				#else:
+				else:
 					# TODO : object not found int asynch database
+					self.log.warn("No asynch entry for  '%s' found in databse: %s ",entry['id'],self.database)
 		except:
 			# TODO error handling here
 			self.log.error("Bad data encountered and failed to elegantly handle it. ")
@@ -852,7 +853,7 @@ class connector:
 		self.log.setLevel(logging.ERROR)
 		self._ch = logging.StreamHandler()
 		self._ch.setLevel(logging.ERROR)
-		formatter = logging.Formatter("[%(levelname)s \t %(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s")
+		formatter = logging.Formatter("\r\n[%(levelname)s \t %(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s")
 		self._ch.setFormatter(formatter)
 		self.log.addHandler(self._ch)
 
