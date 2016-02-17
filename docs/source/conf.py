@@ -32,7 +32,11 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'sphinx.ext.ifconfig',
+    'rst2pdf.pdfbuilder',
 ]
+
+# rst2pdf variable
+pdf_documents = [('index', u'rst2pdf', u'mdc-api-python', u'ARM mbed'),]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

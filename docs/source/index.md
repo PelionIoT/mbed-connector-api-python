@@ -9,7 +9,7 @@ mdc-api-python docs
 Contents:
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
    
    intro
    api

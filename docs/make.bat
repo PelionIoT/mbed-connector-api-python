@@ -80,6 +80,16 @@ if "%1" == "html" (
 	goto end
 )
 
+if "%1" == "pdf" (
+	%SPHINXBUILD% -b pdf %ALLSPHINXOPTS% %BUILDDIR%/pdf
+	if errorlevel 1 exit /b 1
+	echo.
+	echo.Build finished. The pdf pages are in %BUILDDIR%/pdf.
+	goto end
+)
+
+
+
 if "%1" == "dirhtml" (
 	%SPHINXBUILD% -b dirhtml %ALLSPHINXOPTS% %BUILDDIR%/dirhtml
 	if errorlevel 1 exit /b 1
