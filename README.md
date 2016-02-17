@@ -18,27 +18,57 @@ There are more examples in the Docs.
 #### web app
 For a web app we do not need long polling, instead we can simply register a webhook url and then handle all callbacks to that URL appropriately. This method is reccomended for releases as it is less resource intensive than constantly long polling. 
 ```python
+import web
 import mdc_api
-from flask import Flask, request
-app = Flask(__name__)
+import json
 
-token = "CHXKYI7AN334D5WQI9DU9PMMDR8G6VPX3763LOT6"
+# map URL to class to handle requests
+urls = (
+	'/', 'index',
+	'/callbackURL','callbackFunction',
+	'/start','start',
+)
+
+token = "CHANGEME" # Get from connector.mbed.com
 connector = mdc_api.connector(token)
 
-@app.route("/webhook", methods=['PUT', 'GET'])
-def webhook():
-    if request.method == 'PUT':
-        data = request.data
-        print 'webhook triggered with data: `%s`'%data
-        return 'OK'
+class index:
+	def GET(self):
+		return "Hi there, please click 'start' to begin polling mbed Device Connector"
 
-def notificationHandler(notification):
-    print "Notification Received : "+str(notification)
+class callbackFunction:
+	# handle asynchronous events
+	def PUT(self):
+		if web.data: # verify there is data to process
+			print json.loads(web.data()).keys()
+			connector.handler(web.data()) # hand the data to the connector handler
+		return web.ok
 
-if __name__ == '__main__':
-    connector.putCallback("http://mywebapp.com:8080/webhook")
-    connector.setHandler('notifications', notificationHandler)
-    app.run()
+# 'notifications' are routed here
+def notificationHandler(data):
+	print "\r\nNotification Data Received :\r\n %s" %data['notifications']
+
+
+class start:
+	def GET(self):
+		e = connector.putCallback("https://python-workspace-mbedaustin.c9users.io:8080/callbackURL")
+		while not e.isDone():
+			None
+		if e.error:
+			return e.error.errType
+		else:
+			connector.setHandler('notifications', notificationHandler) # send 'notifications' to the notificationHandler FN
+			return "Roger Dodger, started her up!"
+			
+if __name__ == "__main__":
+	app = web.application(urls, globals())
+	app.run()
+	connector.debug(True) # turn on optional debugging
+	e = connector.putCallback("https://python-workspace-mbedaustin.c9users.io:8080/callbackURL") # Change to match your workspace
+	while not e.isDone():
+		None
+	if e.error:
+		print "ERROR in initialization : " + e.error.errType
 ```
 In the code above you can see the webhook URL accepts PUT requests. In the initialization of the flask webapp we register the callback to connector with `putCallback("mywebapp.com:8080/webhook)`. You will need to change `mywebapp.com` to match the public url of your web app, also change the `8080` to the port your web app is running on.
 
@@ -59,7 +89,10 @@ x.putResourceValue("EndpointName","Resource","Value") # send the "Value" to the 
 x.postResourceValue("EndpointName","Resource","Value") # send the "Value" to the "Resource" over a POST request
 y = x.getResourceValue("EndpointName","Resource")  # check the y.isDone() funciton to see when the request completes, the result will then be in y.result. The Resource should be of the form "/X/Y/Z"
 if y.isDone():
-    print "The value of y is " +str(y.result)
+    if not y.error:
+        print("The value of y is " +y.result)
+    else:
+        print("Error : %s",y.error.error)
 
 ##########
 
