@@ -564,16 +564,18 @@ class connector:
 		'''
 		if handler == "async-responses":
 			self.async_responses_callback = cbfn
-		if handler == "registrations-expired":
+		elif handler == "registrations-expired":
 			self.registrations_expired_callback = cbfn
-		if handler == "de-registrations":
+		elif handler == "de-registrations":
 			self.de_registrations_callback = cbfn
-		if handler == "reg-updates":
+		elif handler == "reg-updates":
 			self.reg_updates_callback = cbfn
-		if handler == "registrations":
+		elif handler == "registrations":
 			self.registrations_callback = cbfn
-		if handler == "notifications":
+		elif handler == "notifications":
 			self.notifications_callback = cbfn
+		else:
+			self.log.warn("'%s' is not a legitimate notification channel option. Please check your spelling.",handler)
 
 	# this function needs to spin off a thread that is constantally polling,
 	# should match asynch ID's to values and call their function
