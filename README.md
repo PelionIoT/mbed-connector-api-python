@@ -1,23 +1,29 @@
-## Warning
-This is still in internal Alpha and should not be released to the public or to partners. This is a proof of concept to spur the creation of a more general library and a better API. The goal is to eventually have a meta language to write the interface API in that generates code for python, ruby, nodeJS and others. 
-
 ## Purpose
 This library is meant to be used in conjuntion with the [connector.mbed.com](www.connector.mbed.com) service. This library uses the requests library to interface to mbed connector via HTTP REST calls. Details on the mbed connector RESTful interface can be found [here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/Introduction/#how-to-use-the-api). You can use this library either as part of a webapp or locally on your computer.
 
 ## API
-TODO
+see docs folder or TODO: hosted instance of docs
+
+## Installation
+Clone the repository, then run the following command inside the downloaded folder. 
+
+```python
+sudo python setup.py install
+```
 
 ## Examples
 These examples demonstrate how to use the mbed-connector python library in two instances. The first example is a remotely hosted webapp where a public URL can be registered as a webhook callback address. Second is locally on your computer where you will use LongPolling to constantly poll the server for responses to your requests. LongPolling is necessary as machines behind firewalls cannot easily register a public url to handle callbacks / webhooks.  
+There are more examples in the Docs.
+
 #### web app
 For a web app we do not need long polling, instead we can simply register a webhook url and then handle all callbacks to that URL appropriately. This method is reccomended for releases as it is less resource intensive than constantly long polling. 
 ```python
-import api_L1
+import mdc_api
 from flask import Flask, request
 app = Flask(__name__)
 
 token = "CHXKYI7AN334D5WQI9DU9PMMDR8G6VPX3763LOT6"
-connector = api_L1.connector(token)
+connector = mdc_api.connector(token)
 
 @app.route("/webhook", methods=['PUT', 'GET'])
 def webhook():
@@ -42,8 +48,8 @@ Using the library locally on your computer will require the use of LongPolling. 
 
 ```python
 # Initialization
-import mbed-connector
-x = api("insert api key from [connector.mbed.com](https://connector.mbed.com/#accesskeys)")
+import mdc_api
+x = mdc_api.connector("insert api key from [connector.mbed.com](https://connector.mbed.com/#accesskeys)")
 x.startLongPolling()
 
 # Use 
