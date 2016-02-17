@@ -18,7 +18,7 @@ import os
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('/home/ubuntu/workspace/mbed-connector-python/mdc-api'))
+sys.path.insert(0, os.path.abspath('/home/ubuntu/workspace/mbed-connector-python/mdc_api'))
 
 # -- General configuration ------------------------------------------------
 
@@ -44,7 +44,7 @@ templates_path = ['_templates']
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 # source_suffix = ['.rst', '.md']
-source_suffix = '.md'
+source_suffix = '.rst'
 
 # The encoding of source files.
 #source_encoding = 'utf-8-sig'
