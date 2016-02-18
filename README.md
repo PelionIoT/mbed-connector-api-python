@@ -1,4 +1,5 @@
-## mbed-connector-python : A python package to use the [mbed Device Connector](connector.mbed.com) REST interface to control IoT devices running [mbed Client](https://www.mbed.com/en/development/software/mbed-client/)
+## mbed-connector-python 
+A python package to use the [mbed Device Connector](connector.mbed.com) REST interface to control IoT devices running [mbed Client](https://www.mbed.com/en/development/software/mbed-client/)
 [![Build Status](https://travis-ci.com/ARMmbed/mbed-connector-python.svg?token=Dx5hVfbwqW4x3Gceyoaw&branch=master)](https://travis-ci.com/ARMmbed/mbed-connector-python)
 [![Circle CI](https://circleci.com/gh/ARMmbed/mbed-connector-python.svg?style=svg&circle-token=31558742681378e1069cf4e06fc0c317dfa72eb0)](https://circleci.com/gh/ARMmbed/mbed-connector-python)
 
