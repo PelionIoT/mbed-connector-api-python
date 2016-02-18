@@ -3,7 +3,7 @@
 # Licensed under the Apache License, Version 2.0
 # See LICENSE file for details.
 
-import api_L1
+import mdc_api
 import requests
 import httpretty
 from sure import expect
@@ -124,7 +124,7 @@ class test_connector_mock:
 	# Initialize the mbed connector object and start longpolling
 	def setUp(self):
 		httpretty.HTTPretty.allow_net_connect = False
-		self.connector = api_L1.connector(token, "http://mock")
+		self.connector = mdc_api.connector(token, "http://mock")
 		self.connector.apiVersion=""
 		#self.connector.debug(True)
 		self.md = mockData()

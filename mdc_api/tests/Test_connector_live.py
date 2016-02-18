@@ -3,7 +3,7 @@
 # Licensed under the Apache License, Version 2.0
 # See LICENSE file for details.
 
-import api_L1
+import mdc_api
 from nose.tools import *
 
 # ToDo : change this to make the token pass in through other options
@@ -14,7 +14,7 @@ class test_connector_live:
 	# this function is called before every test function in this class
 	# Initialize the mbed connector object and start longpolling
 	def setUp(self):
-		self.connector = api_L1.connector(token)
+		self.connector = mdc_api.connector(token)
 		self.longPollThread = self.connector.startLongPolling()
 
 	# this function is called after every test function in this class
