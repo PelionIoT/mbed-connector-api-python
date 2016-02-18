@@ -448,12 +448,21 @@ class connector:
 		:return: successful ``.status_code`` / ``.is_done``. Check the ``.error``
 		:rtype: asyncResult
 		'''
+		if isinstance(JSONdata,str) and self._isJSON(JSONdata):
+			self.log.warn("pre-subscription data was a string, converting to a list : %s",JSONdata)
+			JSONdata = json.loads(JSONdata) # convert json string to list
+		if not (isinstance(JSONdata,list) and self._isJSON(JSONdata)):
+			self.log.error("pre-subscription data is not valid. Please make sure it is a valid JSON list")
 		result = asyncResult()
 		data = self._putURL("/subscriptions",JSONdata, versioned=False)
-		if data.status_code == 200: #immediate success
+		if data.status_code == 200: #immediate success with response
 			result.error = False
 			result.is_done = True
 			result.result = data.json()
+		elif data.status_code == 204: # immediate success with no response
+			result.error = False
+			result.is_done = True
+			result.result = []
 		else:
 			result.error = response_codes("presubscription",data.status_code)
 			result.is_done = True
