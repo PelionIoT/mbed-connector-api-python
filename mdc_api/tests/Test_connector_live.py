@@ -7,7 +7,7 @@ import mdc_api
 from nose.tools import *
 
 # ToDo : change this to make the token pass in through other options
-token = "CHXKYI7AN334D5WQI9DU9PMMDR8G6VPX3763LOT6"
+token = "6e4dHnnocri7tJ2zuVmTqLf7CtnSykat9d3x1xd0qZaPp0kV7cALHP25XtvLsMMP2Dp69mDfIJ281ov5iziCaCbRIQvsEelqmxgS"
 
 
 class test_connector_live:
