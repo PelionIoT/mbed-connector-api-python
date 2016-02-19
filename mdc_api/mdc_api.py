@@ -455,11 +455,7 @@ class connector:
 			self.log.error("pre-subscription data is not valid. Please make sure it is a valid JSON list")
 		result = asyncResult()
 		data = self._putURL("/subscriptions",JSONdata, versioned=False)
-		if data.status_code == 200: #immediate success with response
-			result.error = False
-			result.is_done = True
-			result.result = data.json()
-		elif data.status_code == 204: # immediate success with no response
+		if data.status_code == 204: # immediate success with no response
 			result.error = False
 			result.is_done = True
 			result.result = []
