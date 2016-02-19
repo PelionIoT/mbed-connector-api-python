@@ -45,7 +45,7 @@ class test_connector_live:
 	# test the getApiVersion function
 	@timed(5)
 	def test_getApiVersion(self):
-		x = self.connector.getApiVersion()
+		x = self.connector.getApiVersions()
 		self.waitOnAsync(x)
 		assert x.error == False
 
@@ -127,13 +127,39 @@ class test_connector_live:
 
 	@timed(10)
 	def test_putPreSubscription(self):
-		#TODO
-		return
+		# check subscription is put-able
+		j = [{
+				'endpoint-name': "node-001",
+				'resource-path': ["/dev"]},
+			{
+				'endpoint-type': "Light",
+				'resource-path': ["/sen/*"]},
+			{
+				'resource-path': ["/dev/temp","/dev/hum"]
+			}]
+		e = self.connector.putPreSubscription(j)
+		self.waitOnAsync(e)
+		assert e.error == False
 
 	@timed(10)
 	def test_getPreSubscription(self):
-		#TODO
-		return
+		# Check subscription put can be retrieved
+		j = [{
+				'endpoint-name': "node-001",
+				'resource-path': ["/dev"]},
+			{
+				'endpoint-type': "Light",
+				'resource-path': ["/sen/*"]},
+			{
+				'resource-path': ["/dev/temp","/dev/hum"]
+			}]
+		e = self.connector.putPreSubscription(j)
+		self.waitOnAsync(e)
+		ok_(e.error == False, msg="There was an error putting the pre-subscription ")
+		e = self.connector.getPreSubscription()
+		self.waitOnAsync(e)
+		ok_(e.error == False, msg="There was an error getting the pre-subscription ")
+		assert e.result == j 
 
 	@timed(10)
 	def test_putCallbackURL(self):
