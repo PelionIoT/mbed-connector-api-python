@@ -78,6 +78,8 @@ class response_codes:
 
 				# GET /subscriptions - Presubscription Data
 				# Nothing yet?
+				"put_callback_url204":"Successfully set pre-subscription data.",
+				"put_callback_url400":"Malformed content.",
 
 			# Callback
 				# PUT /notification/callback
@@ -113,5 +115,3 @@ class response_codes:
 		self.status_code = status_code
 		self.errType = str(errParent)+str(status_code)
 		self.error = self._setError(self.errType)
-
-
