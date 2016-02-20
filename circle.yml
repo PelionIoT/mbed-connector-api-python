@@ -7,4 +7,5 @@ checkout:
   - sudo apt-get update
   - sudo apt-get install gcc-arm-embedded
   - sudo -H pip install --ignore-installed -U yotta
+  - pip install 'requests[security]'
   - sh ./mdc_api/tests/bin/build_linux_client.sh
