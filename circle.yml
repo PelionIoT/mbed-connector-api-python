@@ -1,6 +1,6 @@
 checkout:
   post:
   - ls
-  - sudo pip install -U pip
-  - sudo pip install -U yotta
+  - sudo -H pip install -U pip
+  - sudo -H pip install -U yotta
   - sh ./mdc_api/tests/bin/build_linux_client.sh
