@@ -1,3 +1,4 @@
 checkout:
   post:
-    - ./mdc_api/tests/bin/build_linux_client.sh
+  - ls
+  - ./mdc_api/tests/bin/build_linux_client.sh
