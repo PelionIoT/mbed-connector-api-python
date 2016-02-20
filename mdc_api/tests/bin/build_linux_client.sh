@@ -1,3 +1,4 @@
+export MBED_USER_ID=mdc-api-python
 cd mdc_api/tests/bin
 git clone https://github.com/bridadan/mbed-client-linux-example.git
 rm mbed-client-linux-example/source/security.h
