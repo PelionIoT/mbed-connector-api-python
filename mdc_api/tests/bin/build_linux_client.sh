@@ -5,5 +5,5 @@ cp ./security.h mbed-client-linux-example/source/security.h
 ls
 cd mbed-client-linux-example
 echo "{\"endpoint-lifetime\": 60}" > config.json
-yottat target x86-linux-native
-yottat build
+yotta target x86-linux-native
+yotta build
