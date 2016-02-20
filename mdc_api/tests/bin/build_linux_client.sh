@@ -1,4 +1,4 @@
-cd test/bin
+cd mdc_api/tests/bin
 git clone https://github.com/bridadan/mbed-client-linux-example.git
 rm mbed-client-linux-example/source/security.h
 cp ./security.h mbed-client-linux-example/source/security.h
