@@ -7,6 +7,8 @@ machine:
   - sudo apt-get install gcc-arm-embedded
   - sudo -H pip install --ignore-installed -U yotta
   - pip install 'requests[security]'
+  
+  post:
   - ./mdc_api/tests/bin/mbed-client-linux-example/build/x86-linux-native/mbed-client-linux-example:
     background: true
   - sleep 5
