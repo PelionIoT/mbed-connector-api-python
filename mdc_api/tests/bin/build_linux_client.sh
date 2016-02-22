@@ -8,4 +8,3 @@ cd mbed-client-linux-example
 echo "{\"endpoint-lifetime\": 60}" > config.json
 yotta target x86-linux-native
 yotta build
-./mbed-client-linux-example/build/x86-linux-native/source/mbed-client-linux-example &
