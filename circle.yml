@@ -18,3 +18,4 @@ test:
     pre:
     - ./mdc_api/tests/bin/mbed-client-linux-example/build/x86-linux-native/source/mbed-client-linux-example:
         background: true
+    - sleep 5
