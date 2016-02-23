@@ -677,7 +677,7 @@ class connector:
 			del tb
 
 	# Turn on / off debug messages based on the onOff variable
-	def debug(self,onOff):
+	def debug(self,onOff,level=='DEBUG'):
 		'''
 		Enable / Disable debugging 
 		
@@ -685,8 +685,18 @@ class connector:
 		:return: none
 		'''
 		if onOff:
-			self.log.setLevel(logging.DEBUG)
-			self._ch.setLevel(logging.DEBUG)
+			if level == 'DEBUG':
+				self.log.setLevel(logging.DEBUG)
+				self._ch.setLevel(logging.DEBUG)
+			elif level == "INFO":
+				self.log.setLevel(logging.INFO)
+				self._ch.setLevel(logging.INFO)
+			elif level == "WARN":
+				self.log.setLevel(logging.WARN)
+				self._ch.setLevel(logging.WARN)
+			elif level == "ERROR":
+				self.log.setLevel(logging.ERROR)
+				self._ch.setLevel(logging.ERROR)
 		else:
 			self.log.setLevel(logging.ERROR)
 			self._ch.setLevel(logging.ERROR)
