@@ -29,21 +29,21 @@ class test_connector_live:
 		return
 
 	# test the getLimits function
-	@timed(5)
+	@timed(10)
 	def test_getLimits(self):
 		x = self.connector.getLimits()
 		self.waitOnAsync(x)
 		assert x.error == False # check for errors
 
 	# test the getConnectorVersion function	
-	@timed(5)
+	@timed(10)
 	def test_getConnectorVersion(self):
 		x = self.connector.getConnectorVersion()
 		self.waitOnAsync(x)
 		assert x.error == False
 
 	# test the getApiVersion function
-	@timed(5)
+	@timed(10)
 	def test_getApiVersion(self):
 		x = self.connector.getApiVersions()
 		self.waitOnAsync(x)
@@ -125,7 +125,7 @@ class test_connector_live:
 		#TODO
 		return
 
-	@timed(10)
+	@timed(60)
 	def test_putPreSubscription(self):
 		# check subscription is put-able
 		j = [{
@@ -141,7 +141,7 @@ class test_connector_live:
 		self.waitOnAsync(e)
 		assert e.error == False
 
-	@timed(10)
+	@timed(60)
 	def test_getPreSubscription(self):
 		# Check subscription put can be retrieved
 		j = [{
