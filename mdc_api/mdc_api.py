@@ -648,7 +648,7 @@ class connector:
 		:return: nothing
 		'''
 		if isinstance(data,r.models.Response):
-			self.log.info("data is request object =  %s", str(data.content))
+			self.log.debug("data is request object =  %s", str(data.content))
 			data = data.content
 		elif isinstance(data,str):
 			self.log.info("data is json string with len %d",len(data))
