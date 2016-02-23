@@ -16,7 +16,7 @@ class test_connector_live:
 	def setUp(self):
 		self.connector = mdc_api.connector(token)
 		self.longPollThread = self.connector.startLongPolling()
-		self.connector.debug(True)
+		#self.connector.debug(True)
 
 	# this function is called after every test function in this class
 	# stop longpolling
