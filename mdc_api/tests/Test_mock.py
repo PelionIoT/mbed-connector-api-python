@@ -144,6 +144,7 @@ class test_connector_mock:
 		return
 
 	# test the getLimits function GET /limits
+	@timed(10)
 	def test_getLimits(self):
 		httpretty.register_uri(httpretty.GET,re.compile("http://mock/limits"),
 								body=self.md.getPayload('limits'),
@@ -155,6 +156,7 @@ class test_connector_mock:
 		expect(x.status_code).to.equal(200)
 
 	# test the getConnectorVersion function, GET /
+	@timed(10)
 	def test_getConnectorVersion(self):
 		httpretty.register_uri(httpretty.GET,re.compile("http://mock/"),
 								body=self.md.getPayload('connectorVersion'),
@@ -166,6 +168,7 @@ class test_connector_mock:
 		expect(x.status_code).to.equal(200)
 
 	# test the getAPIVersion funciton, GET /rest-version
+	@timed(10)
 	def test_getApiVersion(self):
 		httpretty.register_uri(httpretty.GET,re.compile("http://mock/rest-versions"),
 								body=self.md.getPayload('apiVersion'),
@@ -177,6 +180,7 @@ class test_connector_mock:
 		expect(x.status_code).to.equal(200)
 
 	# test the getEndpoints function, GET /endpoints
+	@timed(10)
 	def test_getEndpoints(self):
 		httpretty.register_uri(httpretty.GET,re.compile("http://mock/endpoints"),
 								body=self.md.getPayload('endpoints'),
@@ -188,6 +192,7 @@ class test_connector_mock:
 		expect(x.status_code).to.equal(200)
 
 	# test the getResources function, GET /endpoints/{endpoint}
+	@timed(10)
 	def test_getResources(self):
 		httpretty.register_uri(httpretty.GET,re.compile("http://mock/endpoints"),
 								body=self.md.getPayload('endpoints'),

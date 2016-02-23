@@ -73,6 +73,8 @@ class test_connector_live:
 	def test_getResourceValue(self):
 		ep = self.connector.getEndpoints()
 		self.waitOnAsync(ep)
+		if not ep.result:
+			ok_(ep.result,msg="There are no endpoints on the domain, thus we cannot get resources. Please make sure to connect a endpoint to the domain that has a readable resource.")
 		ok_(ep.error == False, msg="There was an error getting the list of endpoints on the domain")
 		res = self.connector.getResources(ep.result[0]['name'])
 		self.waitOnAsync(res)
@@ -126,7 +128,7 @@ class test_connector_live:
 		#TODO
 		return
 
-	@timed(60)
+	@timed(10)
 	def test_putPreSubscription(self):
 		# check subscription is put-able
 		j = [{
@@ -142,7 +144,7 @@ class test_connector_live:
 		self.waitOnAsync(e)
 		assert e.error == False
 
-	@timed(60)
+	@timed(10)
 	def test_getPreSubscription(self):
 		# Check subscription put can be retrieved
 		j = [{
