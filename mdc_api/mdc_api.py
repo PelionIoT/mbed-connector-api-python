@@ -653,7 +653,7 @@ class connector:
 		elif isinstance(data,str):
 			self.log.info("data is json string with len %d",len(data))
 			if len(data) == 0:
-				self.log.error("Handler received data of 0 length, exiting handler.")
+				self.log.warn("Handler received data of 0 length, exiting handler.")
 				return
 		else:
 			self.log.error("Input is not valid request object or json string : %s" %str(data))
