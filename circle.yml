@@ -1,4 +1,6 @@
 machine:
+    python:
+        version: 2.7.9
     pre:
     - sudo -H pip install -U pip
     - sudo apt-get update && sudo apt-get install python-setuptools  cmake build-essential ninja-build python-dev libffi-dev libssl-dev && sudo easy_install pip
