@@ -648,10 +648,10 @@ class connector:
 		:return: nothing
 		'''
 		if isinstance(data,r.models.Response):
-			self.log.debug("data is request object =  %s" %str(data.content))
+			self.log.info("data is request object =  %s", str(data.content))
 			data = data.content
 		elif isinstance(data,str):
-			self.log.debug("data is json string = %s" %str(data))
+			self.log.info("data is json string with len %d",len(data))
 		else:
 			self.log.error("Input is not valid request object or json string : %s" %str(data))
 			return False
@@ -725,7 +725,7 @@ class connector:
 							self.log.warn("No callback function given")
 				else:
 					# TODO : object not found int asynch database
-					self.log.warn("No asynch entry for  '%s' found in databse: %s ",entry['id'],self.database)
+					self.log.warn("No asynch entry for  '%s' found in databse",entry['id'])
 		except:
 			# TODO error handling here
 			self.log.error("Bad data encountered and failed to elegantly handle it. ")
