@@ -10,6 +10,14 @@ This library is meant to be used in conjuntion with the [connector.mbed.com](www
 see docs folder or TODO: hosted instance of docs
 
 ### Installation
+
+#### pip
+Install the mdc-api package from pip. You may need to use `sudo` on your system. 
+```python
+pip install -U mdc_api
+```
+
+#### setup.py
 Clone the repository, then run the following command inside the downloaded folder. 
 
 ```python
