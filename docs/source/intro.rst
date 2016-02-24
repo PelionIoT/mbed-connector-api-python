@@ -16,6 +16,10 @@ Install the ``mdc_api`` module from pip::
 
     pip install -U mdc_api
 
+or install the module from [the github repo](http://www.github.com/armmbed/mbed-connector-python)::
+
+    python setup.py install
+
 Use
 ---
 There are five steps to using the library. For more detailed examples please see the [Examples](./Examples) section.
