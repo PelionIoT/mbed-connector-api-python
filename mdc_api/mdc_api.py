@@ -379,7 +379,7 @@ class connector:
 		'''
 		result = asyncResult()
 		data = self._deleteURL("/subscriptions/")
-		if data.status_code == 200: #immediate success
+		if data.status_code == 204: #immediate success
 			result.error = False
 			result.is_done = True
 		else:
@@ -616,6 +616,7 @@ class connector:
 		'''
 		if(self.longPollThread.isAlive()):
 			self._stopLongPolling.set()
+			self.log.debug("set stop longpolling flag")
 		else:
 			self.log.warn("LongPolling thread already stopped")
 		return
