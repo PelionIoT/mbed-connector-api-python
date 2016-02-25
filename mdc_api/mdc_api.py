@@ -628,11 +628,10 @@ class connector:
 		while(not self._stopLongPolling.is_set()):
 			try:
 				data = r.get(self.address+'/notification/pull',headers={"Authorization":"Bearer "+self.bearer,"Connection":"keep-alive","accept":"application/json"})
-				self.log.info("Longpoll Returned, len = %d, statuscode=%d",len(data.text),data.status_code)
+				self.log.debug("Longpoll Returned, len = %d, statuscode=%d",len(data.text),data.status_code)
 				# process callbacks
 				if data.status_code == 200: # 204 means no content, do nothing
 					self.handler(data.content)
-					self.log.info("Longpoll Data Length = %d",len(data.content))
 					self.log.debug("Longpoll data = "+data.content)
 			except:
 				self.log.error("longPolling had an issue and threw an exception")
