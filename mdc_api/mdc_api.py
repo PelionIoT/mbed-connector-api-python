@@ -13,7 +13,7 @@ import logging
 
 class asyncResult:
 	"""
-	AsyncResult objects returned by all api_L1 library calls. 
+	AsyncResult objects returned by all mdc_api library calls. 
 	Make sure to check the ``.isDone()`` function and the ``.error`` variable before accessing the ``.result`` variable. 
 
 
@@ -626,10 +626,11 @@ class connector:
 		self.log.debug("LongPolling Started, self.address = %s" %self.address)
 		while(not self._stopLongPolling.is_set()):
 			try:
-				data = r.get(self.address+'/notification/pull',headers={"Authorization":"Bearer "+self.bearer, "Connection":"keep-alive"})
+				data = r.get(self.address+'/notification/pull',headers={"Authorization":"Bearer "+self.bearer})
 				# process callbacks
 				if data.status_code != 204: # 204 means no content, do nothing
 					self.handler(data.content)
+					self.log.info("Longpoll Data Length = %d",len(data.content))
 					self.log.debug("Longpoll data = "+data.content)
 			except:
 				self.log.error("longPolling had an issue and threw an exception")
@@ -691,18 +692,23 @@ class connector:
 			if level == 'DEBUG':
 				self.log.setLevel(logging.DEBUG)
 				self._ch.setLevel(logging.DEBUG)
+				self.log.debug("Debugging level DEBUG enabled")
 			elif level == "INFO":
 				self.log.setLevel(logging.INFO)
 				self._ch.setLevel(logging.INFO)
+				self.log.info("Debugging level INFO enabled")
 			elif level == "WARN":
 				self.log.setLevel(logging.WARN)
 				self._ch.setLevel(logging.WARN)
+				self.log.warn("Debugging level WARN enabled")
 			elif level == "ERROR":
 				self.log.setLevel(logging.ERROR)
 				self._ch.setLevel(logging.ERROR)
+				self.log.error("Debugging level ERROR enabled")
 		else:
 			self.log.setLevel(logging.ERROR)
 			self._ch.setLevel(logging.ERROR)
+			self.log.error("Unrecognized debug level `%s`, set to default level `ERROR` instead",level)
 
 	# internal async-requests handler.
 	# data input is json data
@@ -753,23 +759,23 @@ class connector:
 	# @input data is a dictionary
 	def _defaultHandler(self,data):
 		if 'async-responses' in data.keys():
-			self.log.debug("[Default Handler] async-responses detected : ")
+			self.log.info("async-responses detected : len = %d",len(data["async-responses"]))
 			self.log.debug(data["async-responses"])
 		if 'notifications' in data.keys():
-			self.log.debug("[Default Handler] notifications' detected : ")
+			self.log.info("notifications' detected : len = %d",len(data["notifications"]))
 			self.log.debug(data["notifications"])
 		if 'registrations' in data.keys():
-			self.log.debug("[Default Handler] registrations' detected : ")
+			self.log.info("registrations' detected : len = %d",len(data["registrations"]))
 			self.log.debug(data["registrations"])
 		if 'reg-updates' in data.keys():
 			# removed because this happens every 10s or so, spamming the output
-			self.log.debug("[Default Handler] reg-updates detected : ")
+			self.log.info("reg-updates detected : len = %d",len(data["reg-updates"]))
 			self.log.debug(data["reg-updates"])
 		if 'de-registrations' in data.keys():
-			self.log.debug("[Default Handler] de-registrations detected : ")
+			self.log.info("de-registrations detected : len = %d",len(data["de-registrations"]))
 			self.log.debug(data["de-registrations"])
 		if 'registrations-expired' in data.keys():
-			self.log.debug("[Default Handler] registrations-expired detected : ")
+			self.log.info("registrations-expired detected : len = %d",len(data["registrations-expired"]))
 			self.log.debug(data["registrations-expired"])
 
 	# make the requests.
