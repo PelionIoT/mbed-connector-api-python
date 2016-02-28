@@ -24,13 +24,11 @@ Use
 ---
 There are five steps to using the library. For more detailed examples please see the [Examples](./Examples) section.
 
-You are **required** to set up a notification channel (step 3), either long polling or callback URL, before using any other mbed Device Connector services.
-
     1. Import the package::
 
         import mbed_connector_api
     
-    2. Initialize an instance with an API token from your `Connector Access Keys <https://connector.mbed.com/#accesskeys>`_::
+    2. Initialize a connector instance with an API token from your `Connector Access Keys <https://connector.mbed.com/#accesskeys>`_::
 
         x = mbed_connector_api.connector("API TOKEN")
     

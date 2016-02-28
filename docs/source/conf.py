@@ -224,6 +224,10 @@ latex_elements = {
 
 # Latex figure (float) alignment
 #'figure_align': 'htbp',
+
+# remove blank pages
+'classoptions': ',openany,oneside', 
+'babel' : '\\usepackage[english]{babel}' ,
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
@@ -252,7 +256,7 @@ latex_documents = [
 #latex_appendices = []
 
 # If false, no module index is generated.
-#latex_domain_indices = True
+latex_domain_indices = False
 
 
 # -- Options for manual page output ---------------------------------------
