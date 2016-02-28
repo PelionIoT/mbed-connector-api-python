@@ -40,9 +40,9 @@ When running code on your local machine you will want to use long polling instea
 
 .. code-block:: python
 
-    import mbed_connector_api.connector            # Import library
-    x = mbed_connector_api.connector("API-Token")  # Initialize object
-    x.startLongPolling()                # Start long polling
+    import mbed_connector_api                       # Import library
+    x = mbed_connector_api.connector("API-Token")   # Initialize object
+    x.startLongPolling()                            # Start long polling
     # ... Do stuff
 
 
@@ -52,7 +52,48 @@ Instead of long polling you can use a callback URL, also known as a webhook. To 
 
 .. code-block:: python
 
-<TODO>
+    import web
+    import mbed_connector_api
+    import json
+    
+    # map URL to class to handle requests
+    urls = (
+    	'/', 'index',
+    	'/callback','callbackHandler',
+    )
+    
+    token = "Change Me" # Put your api token here
+    connector = mbed_connector_api.connector(token)
+
+    class index:
+	    def GET(self):
+		    return "Hi there, please click 'start' to begin polling mbed Device Connector"
+	
+	# This function is where the callbackURL will route to
+	class callbackHandler:
+	    # handle asynchronous events from connector
+    	def PUT(self):
+    		if web.data: # verify there is data to process
+    			print json.loads(web.data()).keys() # print the notification types being passed by connector
+    			connector.handler(web.data()) # hand the data to the connector handler
+    		return web.ok
+    	
+	def registerCallbackURL():
+        e = connector.putCallback('https://myHostName/callback') # change myHostName to match the host name of the server where webapp is hosted.
+        while not e.isDone():
+            None
+        if e.error:
+            raise Exception(p.error.errType)
+        else:
+            print("Sucessfully registed callback URL!")
+    
+    if __name__ == "__main__":
+    # 2s after webpy starts we register notification
+    t = Timer(2, registerCallbackURL)
+    t.start()
+
+    app = web.application(urls, globals())
+    app.run()
 
 
 List all endpoints
@@ -71,7 +112,7 @@ Get all endpoints by using the ``getEndpoints()`` function.
         print r.result  # No error; grab the list of endpoints
 
     Example Output:
-    >>> []
+    >>> [{u'name': u'0388e9a4-274e-4709-b568-384198942573', u'status': u'ACTIVE', u'type': u'linux-test'}]
 
 List endpoint resources
 ------------------------
@@ -89,7 +130,9 @@ Get all resources on an endpoint by using the ``getResources()`` function.
         print r.result
     
     Example Output
-    >>> []
+    >>> [{u'obs': False, u'rt': u'ResourceTest', u'type': u'', u'uri': u'/Test/0/S'},
+        {u'obs': True, u'rt': u'ResourceTest', u'type': u'', u'uri': u'/Test/0/D'},
+        {u'obs': False, u'type': u'', u'uri': u'/3/0'}]
 
 
 GET resource value
@@ -107,7 +150,8 @@ Get the value of a resource on an endpoint.
 
     # x is an initialized mbed_connector_api object
     r = x.getResourceValue(ep="EndpointName",res="ResourceName",cbfn=test)
-    
+
+
 PUT value to resource
 ----------------------
 Change the value of a resource on an endpoint by using ``PUT``.
@@ -116,7 +160,7 @@ Change the value of a resource on an endpoint by using ``PUT``.
 
     # x is an initialized mbed_connector_api object
     r = x.putResourceValue('EndpointName','ResourceName','DataToSend')
-    # Check error. Optional: CBFN will be called when operation is completed. 
+
     
 POST value to resource
 -----------------------
@@ -126,8 +170,7 @@ POSTing a value to a resource triggers the associated callback function and pass
 
     # x is an initialized mbed_connector_api object
     r = x.postResource('EndpointName','ResourceName','Optional Data')
-     # Check error. Optional: CBFN will be called when operation is completed. 
-    
+
 
 Subscribe to resource
 ----------------------
@@ -137,7 +180,7 @@ Subscribe to a resource to automatically be notified of changes to resource valu
 
     # x is an initialized mbed_connector_api object
     r = x.pubResourceSubscription('endpointName','resourceName')
-    # Check error, or use optional CBFN to handle failure and success.
+
 
 
 DELETE subscriptions
@@ -164,9 +207,16 @@ If you want debug messages to be printed to the terminal, you need to enable deb
 
 .. code-block:: python
 
-    # x is an initialized mbed_connector_api object
+    # Enable Debug
     x.debug(True) # Turn on debug
     
+    # Set debug message levels
+    # 'ERROR','WARN','INFO','DEBUG' levels can be optionally provided
+    x.debug(True,'INFO')    # display messages >= INFO
+    x.debug(True,'DEBUG')   # display messages >= DEBUG
+    
+    # Turn Debugging off
+    x.debug(False)
 
 Add notification channel handler
 ---------------------------------
