@@ -3,12 +3,12 @@ API
 
 Async Object
 -------------
-.. autoclass:: mdc_api.asyncResult
+.. autoclass:: mbed_connector_api.asyncResult
     :members:
 
 Connector API
 --------------
-.. autoclass:: mdc_api.connector
+.. autoclass:: mbed_connector_api.connector
    :members:
 
 Error Object

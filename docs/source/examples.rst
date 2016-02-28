@@ -25,7 +25,7 @@ You will probably only encounter this object when something has gone wrong. To f
 
 .. code-block:: python
 
-    # x is an initialized mdc_api object
+    # x is an initialized mbed_connector_api object
     e = x.getEndpoints()
     if e.error:
         print e.error.error         # Error message
@@ -40,8 +40,8 @@ When running code on your local machine you will want to use long polling instea
 
 .. code-block:: python
 
-    import mdc_api.connector            # Import library
-    x = mdc_api.connector("API-Token")  # Initialize object
+    import mbed_connector_api.connector            # Import library
+    x = mbed_connector_api.connector("API-Token")  # Initialize object
     x.startLongPolling()                # Start long polling
     # ... Do stuff
 
@@ -61,7 +61,7 @@ Get all endpoints by using the ``getEndpoints()`` function.
 
 .. code-block:: python
 
-    # x is an initialized mdc_api object
+    # x is an initialized mbed_connector_api object
     r = x.getEndpoints()
     while not r.isDone():   # Wait for asynch operation to complete
         None
@@ -79,7 +79,7 @@ Get all resources on an endpoint by using the ``getResources()`` function.
 
 .. code-block:: python
 
-    # x is an initialized mdc_api object
+    # x is an initialized mbed_connector_api object
     r = x.getResources("endpointName")
     while not r.isDone():
         None
@@ -105,7 +105,7 @@ Get the value of a resource on an endpoint.
         else:
             print("Resource Value = %s",data.result)
 
-    # x is an initialized mdc_api object
+    # x is an initialized mbed_connector_api object
     r = x.getResourceValue(ep="EndpointName",res="ResourceName",cbfn=test)
     
 PUT value to resource
@@ -114,7 +114,7 @@ Change the value of a resource on an endpoint by using ``PUT``.
 
 .. code-block:: python
 
-    # x is an initialized mdc_api object
+    # x is an initialized mbed_connector_api object
     r = x.putResourceValue('EndpointName','ResourceName','DataToSend')
     # Check error. Optional: CBFN will be called when operation is completed. 
     
@@ -124,7 +124,7 @@ POSTing a value to a resource triggers the associated callback function and pass
 
 .. code-block:: python
 
-    # x is an initialized mdc_api object
+    # x is an initialized mbed_connector_api object
     r = x.postResource('EndpointName','ResourceName','Optional Data')
      # Check error. Optional: CBFN will be called when operation is completed. 
     
@@ -135,7 +135,7 @@ Subscribe to a resource to automatically be notified of changes to resource valu
 
 .. code-block:: python 
 
-    # x is an initialized mdc_api object
+    # x is an initialized mbed_connector_api object
     r = x.pubResourceSubscription('endpointName','resourceName')
     # Check error, or use optional CBFN to handle failure and success.
 
@@ -160,11 +160,11 @@ You can use pre-subscriptions to subscribe to all domain resources or endpoints 
 
 Enable debug
 -------------
-If you want debug messages to be printed to the terminal, you need to enable debug for your mdc_api object. By default, debugging displays all notification channel messages.
+If you want debug messages to be printed to the terminal, you need to enable debug for your mbed_connector_api object. By default, debugging displays all notification channel messages.
 
 .. code-block:: python
 
-    # x is an initialized mdc_api object
+    # x is an initialized mbed_connector_api object
     x.debug(True) # Turn on debug
     
 
@@ -188,6 +188,6 @@ For more information see the [Connector docs](https://docs.mbed.com/docs/mbed-de
     def test(message):
         print("Received Notification message : %s", message)
 
-    # x is an initialized mdc_api object
+    # x is an initialized mbed_connector_api object
     x.sethandler('notifications', test)
 

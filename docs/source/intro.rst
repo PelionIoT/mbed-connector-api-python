@@ -12,9 +12,9 @@ Requirements
 
 Install
 -------
-Install the ``mdc_api`` module from pip::
+Install the ``mbed_connector_api`` module from pip::
 
-    pip install -U mdc_api
+    pip install -U mbed_connector_api
 
 or install the module from [the github repo](http://www.github.com/armmbed/mbed-connector-python)::
 
@@ -28,11 +28,11 @@ You are **required** to set up a notification channel (step 3), either long poll
 
     1. Import the package::
 
-        import mdc_api
+        import mbed_connector_api
     
     2. Initialize an instance with an API token from your `Connector Access Keys <https://connector.mbed.com/#accesskeys>`_::
 
-        x = mdc_api.connector("API TOKEN")
+        x = mbed_connector_api.connector("API TOKEN")
     
     3. Set a notification channel (use long polling,  or callback URL or a webhook)::
 
