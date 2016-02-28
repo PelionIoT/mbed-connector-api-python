@@ -12,12 +12,12 @@ machine:
 
 checkout:
     post:
-    # - sh ./mdc_api/tests/bin/build_linux_client.sh
+    # - sh ./mbed_connector_api/tests/bin/build_linux_client.sh
   
 test:
     pre:
-    # - ./mdc_api/tests/bin/mbed-client-linux-example/build/x86-linux-native/source/mbed-client-linux-example:
+    # - ./mbed_connector_api/tests/bin/mbed-client-linux-example/build/x86-linux-native/source/mbed-client-linux-example:
     #     background: true
-    - ./mdc_api/tests/bin/circleCI-linux-client:
+    - ./mbed_connector_api/tests/bin/circleCI-linux-client:
         background: true
     - sleep 5

@@ -1,16 +1,16 @@
 from setuptools import setup
 
-setup(name='mdc_api',
+setup(name='mbed_connector_api',
       version='1.0.0',
       description='REST interface library for mbed Device Connector (connector.mbed.com)',
       url='http://github.com/armmbed/mdc-api-python',
       author='ARM mbed',
       author_email='support@mbed.com',
       license='Apache 2.0',
-      packages=['mdc_api'],
+      packages=['mbed_connector_api'],
       keywords='ARM mbed connector device mDC mDS ARMmbed',
       install_requires=[
-          'requests',
+          'requests[security]',
       ],
       classifiers=[
         'Development Status :: 3 - Alpha',
@@ -22,6 +22,7 @@ setup(name='mdc_api',
       test_suite='nose.collector',
       tests_require=['nose', 'nose-cover3'],
       #entry_points={
+      # TODO: add deffinition for tests
       #    'console_scripts': ['funniest-joke=funniest.command_line:main'],
       #},
       zip_safe=False)

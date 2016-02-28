@@ -14,7 +14,7 @@ see docs folder or TODO: hosted instance of docs
 #### pip
 Install the mdc-api package from pip. You may need to use `sudo` on your system. 
 ```python
-pip install -U mdc_api
+pip install -U mbed_connector_api
 ```
 
 #### setup.py
@@ -32,7 +32,7 @@ There are more examples in the Docs.
 For a web app we do not need long polling, instead we can simply register a webhook url and then handle all callbacks to that URL appropriately. This method is reccomended for releases as it is less resource intensive than constantly long polling. 
 ```python
 import web
-import mdc_api
+import mbed_connector_api
 import json
 
 # map URL to class to handle requests
@@ -43,7 +43,7 @@ urls = (
 )
 
 token = "CHANGEME" # Get from connector.mbed.com
-connector = mdc_api.connector(token)
+connector = mbed_connector_api.connector(token)
 
 class index:
 	def GET(self):
@@ -91,8 +91,8 @@ Using the library locally on your computer will require the use of LongPolling. 
 
 ```python
 # Initialization
-import mdc_api
-x = mdc_api.connector("insert api key from [connector.mbed.com](https://connector.mbed.com/#accesskeys)")
+import mbed_connector_api
+x = mbed_connector_api.connector("insert api key from [connector.mbed.com](https://connector.mbed.com/#accesskeys)")
 x.startLongPolling()
 
 # Use 

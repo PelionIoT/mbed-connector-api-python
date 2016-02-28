@@ -13,7 +13,7 @@ import logging
 
 class asyncResult:
 	"""
-	AsyncResult objects returned by all mdc_api library calls. 
+	AsyncResult objects returned by all mbed_connector_api library calls. 
 	Make sure to check the ``.isDone()`` function and the ``.error`` variable before accessing the ``.result`` variable. 
 
 

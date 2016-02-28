@@ -4,5 +4,5 @@
 # See LICENSE file for details.
 
 from connectorError import response_codes
-from mdc_api import asyncResult
-from mdc_api import connector
+from mbed_connector_api import asyncResult
+from mbed_connector_api import connector
