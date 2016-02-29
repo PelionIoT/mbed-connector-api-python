@@ -12,7 +12,8 @@ Requirements
 
 Install
 -------
-Install the ``mbed_connector_api`` module from pip::
+Install the ``mbed_connector_api`` module from pip
+NOTE: the pip package is not yet public, please use the manual installation untill this issue is resolved.::
 
     pip install -U mbed_connector_api
 
