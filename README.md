@@ -7,7 +7,8 @@ A python package to use the [mbed Device Connector](https://connector.mbed.com/)
 This library is meant to be used in conjuntion with the [connector.mbed.com](https://connector.mbed.com/) service. This library uses the requests library to interface to mbed connector via HTTP REST calls. Details on the mbed connector RESTful interface can be found [here](https://docs.mbed.com/docs/mbed-client-guide/en/latest/Introduction/#how-to-use-the-api). You can use this library either as part of a webapp or locally on your computer.
 
 ### API
-see docs folder or TODO: hosted instance of docs
+* [pdf in docs folder](/docs/api.pdf) 
+* [docs.mbed.com](https://docs.mbed.com/docs/mbed-connector-api-python)
 
 ### Installation
 

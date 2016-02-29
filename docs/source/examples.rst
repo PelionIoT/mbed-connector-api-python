@@ -198,7 +198,38 @@ You can use pre-subscriptions to subscribe to all domain resources or endpoints 
 
 .. code-block:: python
    
-    #TODO < CODE HERE>
+   # j is a valid json blob
+   j = [
+           {
+             endpoint-name: "node-001",
+             resource-path: ["/dev"]
+           },
+           {
+             endpoint-type: "Light",
+             resource-path: ["/sen/*"]
+           },
+           {
+             endpoint-name: "node*"
+           },
+           {
+             endpoint-type: "Sensor"
+           },
+           {
+             resource-path: ["/dev/temp","/dev/hum"]
+           }
+        ]
+        
+    # x is an initialized mbed_connector_api object
+    e = x.putPreSubscription()
+    
+    # now you can check the pre-subscription
+    e = x.getPreSubscription()
+    while not e.isDone():
+        None
+    if e.error:
+        print e.error.error
+    else:
+        print("Got Pre-subscriptions: ",e.result)
     
 
 Enable debug
@@ -230,7 +261,7 @@ The following notifications types are permitted:
     5. ``‘registrations’``: new endpoints added to domain.
     6. ``‘notifications’``: subscribed resource value changed.
     
-For more information see the [Connector docs](https://docs.mbed.com/docs/mbed-device-connector-web-interfaces).
+For more information see the 'Connector docs <https://docs.mbed.com/docs/mbed-device-connector-web-interfaces>'_.
 
 .. code-block:: python
 

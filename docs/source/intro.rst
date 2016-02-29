@@ -7,7 +7,7 @@ The mdc-api-python module is an interface between a python application and the `
 Requirements
 -------------
     1. Python 2.7.9+ 
-    2. [connector.mbed.com](http://www.connector.mbed.com) account
+    2. 'connector.mbed.com <http://www.connector.mbed.com>'_ account
 
 
 Install
@@ -16,13 +16,13 @@ Install the ``mbed_connector_api`` module from pip::
 
     pip install -U mbed_connector_api
 
-or install the module from [the github repo](http://www.github.com/armmbed/mbed-connector-python)::
+or install the module from 'the github repo <http://www.github.com/armmbed/mbed-connector-api-python>'_::
 
     python setup.py install
 
 Use
 ---
-There are five steps to using the library. For more detailed examples please see the [Examples](./Examples) section.
+There are five steps to using the library. For more detailed examples please see the 'Examples <https://docs.mbed.com/docs/mbed-connector-api-python/en/latest/examples.html>'_ section.
 
     1. Import the package::
 
