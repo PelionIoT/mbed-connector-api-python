@@ -261,7 +261,7 @@ The following notifications types are permitted:
     5. ``‘registrations’``: new endpoints added to domain.
     6. ``‘notifications’``: subscribed resource value changed.
     
-For more information see the 'Connector docs <https://docs.mbed.com/docs/mbed-device-connector-web-interfaces>'_.
+For more information see the `Connector docs <https://docs.mbed.com/docs/mbed-device-connector-web-interfaces>`_.
 
 .. code-block:: python
 
