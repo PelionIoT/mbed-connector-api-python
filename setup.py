@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='mbed_connector_api',
-      version='1.0.0',
+      version='1.0.1',
       description='REST interface library for mbed Device Connector (connector.mbed.com)',
       url='http://github.com/armmbed/mdc-api-python',
       author='ARM mbed',
