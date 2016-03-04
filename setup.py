@@ -3,7 +3,7 @@ from setuptools import setup
 setup(name='mbed_connector_api',
       version='1.0.1',
       description='REST interface library for mbed Device Connector (connector.mbed.com)',
-      url='http://github.com/armmbed/mdc-api-python',
+      url='http://github.com/armmbed/mbed-connector-api-python',
       author='ARM mbed',
       author_email='support@mbed.com',
       license='Apache 2.0',
