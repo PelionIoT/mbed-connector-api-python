@@ -15,9 +15,8 @@ This library is meant to be used in conjuntion with the [connector.mbed.com](htt
 
 #### pip
 Install the mdc-api package from pip. You may need to use `sudo` on your system.
-NOTE: this package is not yet on pip, please use manual install instructions for the moment. 
 ```python
-pip install -U mbed_connector_api
+pip install -U mbed-connector-api
 ```
 
 #### setup.py
