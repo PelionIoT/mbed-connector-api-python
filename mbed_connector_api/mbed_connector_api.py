@@ -337,7 +337,7 @@ class connector:
 		result = asyncResult()
 		result.endpoint = ep
 		data = self._deleteURL("/subscriptions/"+ep)
-		if data.status_code == 200: #immediate success
+		if data.status_code == 204: #immediate success
 			result.error = False
 			result.is_done = True
 		else:
@@ -360,7 +360,7 @@ class connector:
 		result.endpoint = ep
 		result.resource = res
 		data = self._deleteURL("/subscriptions/"+ep+res)
-		if data.status_code == 200: #immediate success
+		if data.status_code == 204: #immediate success
 			result.error = False
 			result.is_done = True
 		else:
