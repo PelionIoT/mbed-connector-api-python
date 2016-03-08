@@ -15,7 +15,7 @@ from base64 import standard_b64encode as b64encode
 import random
 
 # ToDo : change this to make the token pass in through other options
-token = "6e4dHnnocri7tJ2zuVmTqLf7CtnSykat9d3x1xd0qZaPp0kV7cALHP25XtvLsMMP2Dp69mDfIJ281ov5iziCaCbRIQvsEelqmxgS"
+token = "mtq2lz1f0GRGbr9yt64yZz39L3VUJxBH4aMwH3ehyQ03OPGkDtlRWl6m2d8Rv9Kbwc8faDdceyN5jWY12S9RfWOrG7HpG74cGU6l"
 
 class asynchMocker:
 	"""The asynchMocker class is used to mock asynchronous responses for longpolling """
