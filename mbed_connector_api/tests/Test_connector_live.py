@@ -20,7 +20,7 @@ class test_connector_live:
 	def setUp(self):
 		self.connector = mbed_connector_api.connector(token)
 		self.longPollThread = self.connector.startLongPolling()
-		self.connector.debug(True,level='INFO')
+		#self.connector.debug(True,level='INFO')
 
 	# this function is called after every test function in this class
 	# stop longpolling
