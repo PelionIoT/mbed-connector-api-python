@@ -113,10 +113,16 @@ class test_connector_live:
 		x = self.connector.putResourceSubscription(_ep,_res)
 		self.waitOnAsync(x)
 		assert x.error == False
+		
+	@timed(10)
+	def test_getEndpointSubscriptions(self):
+		x = self.connector.getEndpointSubscriptions(_ep)
+		self.waitOnAsync(x)
+		assert x.error == False
 
 	@timed(10)
-	def test_deleteEndpointSubscriptions(self):
-		x = self.connector.deleteEndpointSubscriptions(_ep)
+	def test_getResourceSubscription(self):
+		x = self.connector.getResourceSubscription(_ep,_res)
 		self.waitOnAsync(x)
 		assert x.error == False
 
@@ -128,19 +134,16 @@ class test_connector_live:
 		assert x.error == False
 
 	@timed(10)
+	def test_deleteEndpointSubscriptions(self):
+		x = self.connector.deleteEndpointSubscriptions(_ep)
+		self.waitOnAsync(x)
+		assert x.error == False
+
+	@timed(10)
 	def test_deleteAllSubscriptions(self):
-		#TODO
-		return
-
-	@timed(10)
-	def test_getEndpointSubscriptions(self):
-		#TODO
-		return
-
-	@timed(10)
-	def test_getResourceSubscription(self):
-		#TODO
-		return
+		x = self.connector.deleteAllSubscriptions()
+		self.waitOnAsync(x)
+		assert x.error == False
 
 	@timed(10)
 	def test_putPreSubscription(self):
