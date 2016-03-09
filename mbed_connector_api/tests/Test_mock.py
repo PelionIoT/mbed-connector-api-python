@@ -3,6 +3,12 @@
 # Licensed under the Apache License, Version 2.0
 # See LICENSE file for details.
 
+# These tests assume a client with the following resources
+# /ci-object - type:'ci-endpoint'
+# 		/static - observable:false, 
+#		/dynamic - observable:true, postable:true
+
+
 import mbed_connector_api
 import requests
 import httpretty
