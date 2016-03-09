@@ -3,9 +3,20 @@
 # Licensed under the Apache License, Version 2.0
 # See LICENSE file for details.
 
+# These tests assume a client with the following resources
+# endpoint name = 64754207-5e02-4d03-904b-82151ad55ea6
+# /ci-object - type:'ci-endpoint'
+# 		/static - observable:false, 
+#		/dynamic - observable:true, postable:true, this resource will incriment its value every second
+
 import mbed_connector_api
 from nose.tools import *
 import os
+
+_ep  = '64754207-5e02-4d03-904b-82151ad55ea6'
+_objID = 'ci-object'
+_resID = 'dynamic'
+_res = "/"+_objID+"/0/"+_resID
 
 # Grab the connector token from the 'ACCESS_KEY' environment variable
 if 'ACCESS_KEY' in os.environ.keys():
@@ -60,37 +71,37 @@ class test_connector_live:
 		x = self.connector.getEndpoints()
 		self.waitOnAsync(x)
 		assert x.error == False
+		
+	# test the getEndpoints function, subfuntion typeFilter
+	@timed(10)
+	def test_getEndpointsByType(self):
+		x = self.connector.getEndpoints(typeOfEndpoint="ci-endpoint")
+		self.waitOnAsync(x)
+		assert x.error == False
 
 	# test the getResources function
 	@timed(10)
 	def test_getResources(self):
-		ep = self.connector.getEndpoints() # get list of endpoints
-		self.waitOnAsync(ep)
-		assert ep.error == False
-		if not ep.result:
-			ok_(ep.result,msg="There are no endpoints on the domain, thus we cannot get resources. Please make sure to connect a endpoint to the domain that has a readable resource.")
-		x = self.connector.getResources(ep.result[0]['name']) # use first endpoint returned
+		x = self.connector.getResources(_ep) # use first endpoint returned
 		self.waitOnAsync(x)
 		assert x.error == False
 
 	@timed(10)
 	def test_getResourceValue(self):
-		ep = self.connector.getEndpoints()
-		self.waitOnAsync(ep)
-		if not ep.result:
-			ok_(ep.result,msg="There are no endpoints on the domain, thus we cannot get resources. Please make sure to connect a endpoint to the domain that has a readable resource.")
-		ok_(ep.error == False, msg="There was an error getting the list of endpoints on the domain")
-		res = self.connector.getResources(ep.result[0]['name'])
-		self.waitOnAsync(res)
-		ok_(ep.error == False, msg="There was an error getting the list of resources for the endpoint")
-		x = self.connector.getResourceValue(ep.result[0]['name'], res.result[0]['uri'])
+		x = self.connector.getResourceValue(_ep,_res)
 		self.waitOnAsync(x)
 		assert x.error == False
 
 	@timed(10)
 	def test_postResource(self):
-		#TODO
-		return
+		# test POST without data
+		x = self.connector.postResource(_ep,_res)
+		self.waitOnAsync(x)
+		assert x.error == False
+		# test POST with data
+		x = self.connector.postResource(_ep,_res,"Hello World from the CI")
+		self.waitOnAsync(x)
+		assert x.error == False
 
 	@timed(10)
 	def test_deleteEndpoint(self):
@@ -99,13 +110,15 @@ class test_connector_live:
 
 	@timed(10)
 	def test_putResourceSubscription(self):
-		#TODO
-		return
+		x = self.connector.putResourceSubscription(_ep,_res)
+		self.waitOnAsync(x)
+		assert x.error == False
 
 	@timed(10)
 	def test_deleteSubscription(self):
-		#TODO
-		return
+		x = self.connector.deleteResourceSubscription(_ep,_res)
+		self.waitOnAsync(x)
+		assert x.error == False
 
 	@timed(10)
 	def test_deleteEnpointSubscriptions(self):
