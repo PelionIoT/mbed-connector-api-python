@@ -115,20 +115,17 @@ class test_connector_live:
 		assert x.error == False
 
 	@timed(10)
-	def test_deleteSubscription(self):
-		x = self.connector.deleteResourceSubscription(_ep,_res)
+	def test_deleteEndpointSubscriptions(self):
+		x = self.connector.deleteEndpointSubscriptions(_ep)
 		self.waitOnAsync(x)
 		assert x.error == False
 
 	@timed(10)
-	def test_deleteEnpointSubscriptions(self):
-		#TODO
-		return
-
-	@timed(10)
 	def test_deleteResourceSubscription(self):
-		#TODO
-		return
+		# TODO, may need to first subscribe, then unsubscribe?
+		x = self.connector.deleteResourceSubscription(_ep,_res)
+		self.waitOnAsync(x)
+		assert x.error == False
 
 	@timed(10)
 	def test_deleteAllSubscriptions(self):
