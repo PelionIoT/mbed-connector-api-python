@@ -326,7 +326,7 @@ class connector:
 		result.status_code = data.status_code
 		return result
 
-	def deleteEnpointSubscriptions(self,ep):
+	def deleteEndpointSubscriptions(self,ep):
 		'''
 		Delete all subscriptions on specified endpoint ``ep``
 		
