@@ -16,7 +16,7 @@ checkout:
   
 test:
     pre:
-    # - ./mbed_connector_api/tests/bin/mbed-client-linux-example/build/x86-linux-native/source/mbed-client-linux-example:
+    # - ./mbed_connector_api/tests/bin/mbed-client-linux-ci/build/x86-linux-native/source/mbed-client-linux-ci:
     #     background: true
     - ./mbed_connector_api/tests/bin/circleCI-linux-client:
         background: true
