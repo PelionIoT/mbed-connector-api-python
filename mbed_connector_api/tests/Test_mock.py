@@ -13,6 +13,7 @@ import re
 import json
 from base64 import standard_b64encode as b64encode
 import random
+import os
 
 # Grab the connector token from the 'ACCESS_KEY' environment variable
 if 'ACCESS_KEY' in os.environ.keys():
