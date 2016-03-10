@@ -49,59 +49,59 @@ class test_connector_live:
 	def test_getLimits(self):
 		x = self.connector.getLimits()
 		self.waitOnAsync(x)
-		assert x.error == False # check for errors
+		ok_(x.error == False, msg=("Error: "+x.error.error+" errType: "+x.error.errType if x.error else ""))
 
 	# test the getConnectorVersion function	
 	@timed(10)
 	def test_getConnectorVersion(self):
 		x = self.connector.getConnectorVersion()
 		self.waitOnAsync(x)
-		assert x.error == False
+		ok_(x.error == False, msg=("Error: "+x.error.error+" errType: "+x.error.errType if x.error else ""))
 
 	# test the getApiVersion function
 	@timed(10)
 	def test_getApiVersion(self):
 		x = self.connector.getApiVersions()
 		self.waitOnAsync(x)
-		assert x.error == False
+		ok_(x.error == False, msg=("Error: "+x.error.error+" errType: "+x.error.errType if x.error else ""))
 
 	# test the getEndpoints function
 	@timed(10)
 	def test_getEndpoints(self):
 		x = self.connector.getEndpoints()
 		self.waitOnAsync(x)
-		assert x.error == False
-		
+		ok_(x.error == False, msg=("Error: "+x.error.error+" errType: "+x.error.errType if x.error else ""))
+
 	# test the getEndpoints function, subfuntion typeFilter
 	@timed(10)
 	def test_getEndpointsByType(self):
 		x = self.connector.getEndpoints(typeOfEndpoint="ci-endpoint")
 		self.waitOnAsync(x)
-		assert x.error == False
+		ok_(x.error == False, msg=("Error: "+x.error.error+" errType: "+x.error.errType if x.error else ""))
 
 	# test the getResources function
 	@timed(10)
 	def test_getResources(self):
 		x = self.connector.getResources(_ep) # use first endpoint returned
 		self.waitOnAsync(x)
-		assert x.error == False
+		ok_(x.error == False, msg=("Error: "+x.error.error+" errType: "+x.error.errType if x.error else ""))
 
 	@timed(10)
 	def test_getResourceValue(self):
 		x = self.connector.getResourceValue(_ep,_res)
 		self.waitOnAsync(x)
-		assert x.error == False
+		ok_(x.error == False, msg=("Error: "+x.error.error+" errType: "+x.error.errType if x.error else ""))
 
 	@timed(10)
 	def test_postResource(self):
 		# test POST without data
 		x = self.connector.postResource(_ep,_res)
 		self.waitOnAsync(x)
-		assert x.error == False
+		ok_(x.error == False, msg=("Error: "+x.error.error+" errType: "+x.error.errType if x.error else ""))
 		# test POST with data
 		x = self.connector.postResource(_ep,_res,"Hello World from the CI")
 		self.waitOnAsync(x)
-		assert x.error == False
+		ok_(x.error == False, msg=("Error: "+x.error.error+" errType: "+x.error.errType if x.error else ""))
 
 	@timed(10)
 	def test_deleteEndpoint(self):
@@ -112,38 +112,38 @@ class test_connector_live:
 	def test_putResourceSubscription(self):
 		x = self.connector.putResourceSubscription(_ep,_res)
 		self.waitOnAsync(x)
-		assert x.error == False
-		
+		ok_(x.error == False, msg=("Error: "+x.error.error+" errType: "+x.error.errType if x.error else ""))
+
 	@timed(10)
 	def test_getEndpointSubscriptions(self):
 		x = self.connector.getEndpointSubscriptions(_ep)
 		self.waitOnAsync(x)
-		assert x.error == False
+		ok_(x.error == False, msg=("Error: "+x.error.error+" errType: "+x.error.errType if x.error else ""))
 
 	@timed(10)
 	def test_getResourceSubscription(self):
 		x = self.connector.getResourceSubscription(_ep,_res)
 		self.waitOnAsync(x)
-		assert x.error == False
+		ok_(x.error == False, msg=("Error: "+x.error.error+" errType: "+x.error.errType if x.error else ""))
 
 	@timed(10)
 	def test_deleteResourceSubscription(self):
 		# TODO, may need to first subscribe, then unsubscribe?
 		x = self.connector.deleteResourceSubscription(_ep,_res)
 		self.waitOnAsync(x)
-		assert x.error == False
+		ok_(x.error == False, msg=("Error: "+x.error.error+" errType: "+x.error.errType if x.error else ""))
 
 	@timed(10)
 	def test_deleteEndpointSubscriptions(self):
 		x = self.connector.deleteEndpointSubscriptions(_ep)
 		self.waitOnAsync(x)
-		assert x.error == False
+		ok_(x.error == False, msg=("Error: "+x.error.error+" errType: "+x.error.errType if x.error else ""))
 
 	@timed(10)
 	def test_deleteAllSubscriptions(self):
 		x = self.connector.deleteAllSubscriptions()
 		self.waitOnAsync(x)
-		assert x.error == False
+		ok_(x.error == False, msg=("Error: "+x.error.error+" errType: "+x.error.errType if x.error else ""))
 
 	@timed(10)
 	def test_putPreSubscription(self):
@@ -157,9 +157,9 @@ class test_connector_live:
 			{
 				'resource-path': ["/dev/temp","/dev/hum"]
 			}]
-		e = self.connector.putPreSubscription(j)
-		self.waitOnAsync(e)
-		assert e.error == False
+		x = self.connector.putPreSubscription(j)
+		self.waitOnAsync(x)
+		ok_(x.error == False, msg=("Error: "+x.error.error+" errType: "+x.error.errType if x.error else ""))
 
 	@timed(10)
 	def test_getPreSubscription(self):
