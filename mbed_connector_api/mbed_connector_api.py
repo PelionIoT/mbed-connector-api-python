@@ -810,9 +810,9 @@ class connector:
 	def _postURL(self, url,payload="",versioned=True):
 		if self._isJSON(payload):
 			if versioned:
-				return r.post(self.address+self.apiVersion+url,json=payload,headers={"Authorization":"Bearer "+self.bearer,"Content-Type":"text/plain"})
+				return r.post(self.address+self.apiVersion+url,data=payload,headers={"Authorization":"Bearer "+self.bearer,"Content-Type":"text/plain"})
 			else:
-				return r.post(self.address+url,json=payload,headers={"Authorization":"Bearer "+self.bearer,"Content-Type":"text/plain"})
+				return r.post(self.address+url,data=payload,headers={"Authorization":"Bearer "+self.bearer,"Content-Type":"text/plain"})
 		else:
 			if versioned:
 				return r.post(self.address+self.apiVersion+url,data=payload,headers={"Authorization":"Bearer "+self.bearer,"Content-Type":"text/plain"})
