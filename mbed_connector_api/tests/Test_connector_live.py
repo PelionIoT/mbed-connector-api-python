@@ -118,7 +118,7 @@ class test_connector_live:
 	def test_getEndpointSubscriptions(self):
 		x = self.connector.putResourceSubscription(_ep,_res)
 		self.waitOnAsync(x)
-		assert x.error == false
+		assert x.error == False
 		x = self.connector.getEndpointSubscriptions(_ep)
 		self.waitOnAsync(x)
 		ok_(x.error == False, msg=("Error: "+x.error.error+" errType: "+x.error.errType if x.error else ""))
@@ -127,7 +127,7 @@ class test_connector_live:
 	def test_getResourceSubscription(self):
 		x = self.connector.putResourceSubscription(_ep,_res)
 		self.waitOnAsync(x)
-		assert x.error == false
+		assert x.error == False
 		x = self.connector.getResourceSubscription(_ep,_res)
 		self.waitOnAsync(x)
 		ok_(x.error == False, msg=("Error: "+x.error.error+" errType: "+x.error.errType if x.error else ""))
@@ -137,7 +137,7 @@ class test_connector_live:
 		# TODO, may need to first subscribe, then unsubscribe?
 		x = self.connector.putResourceSubscription(_ep,_res)
 		self.waitOnAsync(x)
-		assert x.error == false
+		assert x.error == False
 		x = self.connector.deleteResourceSubscription(_ep,_res)
 		self.waitOnAsync(x)
 		ok_(x.error == False, msg=("Error: "+x.error.error+" errType: "+x.error.errType if x.error else ""))
@@ -146,7 +146,7 @@ class test_connector_live:
 	def test_deleteEndpointSubscriptions(self):
 		x = self.connector.putResourceSubscription(_ep,_res)
 		self.waitOnAsync(x)
-		assert x.error == false
+		assert x.error == False
 		x = self.connector.deleteEndpointSubscriptions(_ep)
 		self.waitOnAsync(x)
 		ok_(x.error == False, msg=("Error: "+x.error.error+" errType: "+x.error.errType if x.error else ""))
