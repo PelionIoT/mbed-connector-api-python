@@ -808,16 +808,25 @@ class connector:
 
 	# put data to URL with json payload in dataIn
 	def _postURL(self, url,payload="",versioned=True):
-		if self._isJSON(payload):
-			if versioned:
-				return r.post(self.address+self.apiVersion+url,data=payload,headers={"Authorization":"Bearer "+self.bearer,"Content-Type":"text/plain"})
-			else:
-				return r.post(self.address+url,data=payload,headers={"Authorization":"Bearer "+self.bearer,"Content-Type":"text/plain"})
+		addr = self.address+self.apiVersion+url if versioned else self.address+url
+		h = {"Authorization":"Bearer "+self.bearer}
+		if payload:
+			self.log.info("POSTing with payload: %s ",payload)
+			return r.post(addr,data=payload,headers=h)
 		else:
-			if versioned:
-				return r.post(self.address+self.apiVersion+url,data=payload,headers={"Authorization":"Bearer "+self.bearer,"Content-Type":"text/plain"})
-			else:
-				return r.post(self.address+url,data=payload,headers={"Authorization":"Bearer "+self.bearer,"Content-Type":"text/plain"})
+			self.log.info("POSTing")
+			return r.post(addr,headers=h)
+		
+		# if self._isJSON(payload):
+		# 	if versioned:
+		# 		return r.post(self.address+self.apiVersion+url,data=payload,headers={"Authorization":"Bearer "+self.bearer,"Content-Type":"text/plain"})
+		# 	else:
+		# 		return r.post(self.address+url,data=payload,headers={"Authorization":"Bearer "+self.bearer,"Content-Type":"text/plain"})
+		# else:
+		# 	if versioned:
+		# 		return r.post(self.address+self.apiVersion+url,data=payload,headers={"Authorization":"Bearer "+self.bearer,"Content-Type":"text/plain"})
+		# 	else:
+		# 		return r.post(self.address+url,data=payload,headers={"Authorization":"Bearer "+self.bearer,"Content-Type":"text/plain"})
 
 	# delete endpoint
 	def _deleteURL(self, url,versioned=True):
