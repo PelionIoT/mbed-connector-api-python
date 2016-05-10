@@ -131,8 +131,8 @@ x.subscribeToResource("Endpoint","Resource",callbackFN) # This will call the cal
 #### Debug
 This module uses the logging module. To enable more robust debugging initialize your object instance and then use the `.debug(True)` method to enable more robust debugging of the module
 
-### Requirements
-This module uses the `requests` library. If you do not have it installed please install it. 
+### Tests
+This module uses the `nose` test framework. You can install it by running `pip install nose` , then running `nosetests` in the top level directory for this project. Currently tests are desiged to test a hard coded endpoint. You will need to change the endpoint name and API Token in the test files in the `mbed_connector_api/tests` directory. 
 
 ### License
 Apache 2.0
