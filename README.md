@@ -32,6 +32,10 @@ sudo python setup.py install
 These examples demonstrate how to use the mbed-connector python library in two instances. The first example is a remotely hosted webapp where a public URL can be registered as a webhook callback address. Second is locally on your computer where you will use LongPolling to constantly poll the server for responses to your requests. LongPolling is necessary as machines behind firewalls cannot easily register a public url to handle callbacks / webhooks.  
 There are more examples in the Docs.
 
+Other examples can be seen here:
+- [quickstart](https://github.com/armmbed/mbed-connector-api-python-quickstart)
+- [github build failure alarm](https://github.com/BlackstoneEngineering/connector-example-python-github-build-failure)
+
 ##### web app
 For a web app we do not need long polling, instead we can simply register a webhook url and then handle all callbacks to that URL appropriately. This method is reccomended for releases as it is less resource intensive than constantly long polling. 
 ```python
