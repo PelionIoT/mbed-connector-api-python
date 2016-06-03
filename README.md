@@ -35,6 +35,7 @@ There are more examples in the Docs.
 Other examples can be seen here:
 - [quickstart](https://github.com/armmbed/mbed-connector-api-python-quickstart)
 - [github build failure alarm](https://github.com/BlackstoneEngineering/connector-example-python-github-build-failure)
+- [log values to excel file](https://github.com/BlackstoneEngineering/connector-log-to-excel)
 
 ##### web app
 For a web app we do not need long polling, instead we can simply register a webhook url and then handle all callbacks to that URL appropriately. This method is reccomended for releases as it is less resource intensive than constantly long polling. 
