@@ -623,11 +623,14 @@ class connector:
 
 	# Thread to constantly long poll connector and process the feedback.
 	# TODO: pass wait / noWait on to long polling thread, currently the user can set it but it doesnt actually affect anything.
-	def longPoll(self):
+	def longPoll(self, versioned=True):
 		self.log.debug("LongPolling Started, self.address = %s" %self.address)
 		while(not self._stopLongPolling.is_set()):
 			try:
-				data = r.get(self.address+'/notification/pull',headers={"Authorization":"Bearer "+self.bearer,"Connection":"keep-alive","accept":"application/json"})
+				if versioned:
+					data = r.get(self.address+self.apiVersion+'/notification/pull',headers={"Authorization":"Bearer "+self.bearer,"Connection":"keep-alive","accept":"application/json"})
+				else:
+					data = r.get(self.address+'/notification/pull',headers={"Authorization":"Bearer "+self.bearer,"Connection":"keep-alive","accept":"application/json"})
 				self.log.debug("Longpoll Returned, len = %d, statuscode=%d",len(data.text),data.status_code)
 				# process callbacks
 				if data.status_code == 200: # 204 means no content, do nothing
@@ -792,7 +795,7 @@ class connector:
 			return r.get(self.address+url,headers={"Authorization":"Bearer "+self.bearer},params=query)
 
 	# put data to URL with json payload in dataIn
-	def _putURL(self, url,payload="",versioned=True):
+	def _putURL(self, url,payload=None,versioned=True):
 		if self._isJSON(payload):
 			self.log.debug("PUT payload is json")
 			if versioned:
