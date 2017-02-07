@@ -795,7 +795,7 @@ class connector:
 			return r.get(self.address+url,headers={"Authorization":"Bearer "+self.bearer},params=query)
 
 	# put data to URL with json payload in dataIn
-	def _putURL(self, url,payload="",versioned=True):
+	def _putURL(self, url,payload=None,versioned=True):
 		if self._isJSON(payload):
 			self.log.debug("PUT payload is json")
 			if versioned:
